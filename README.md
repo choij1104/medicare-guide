@@ -11,6 +11,7 @@ A free Korean/English guide that helps Korean-American seniors in Texas understa
 - Extra Help, Medicare Savings Programs and Medicaid, with an Extra Help self-check
 - Scam warning checklist and free official phone numbers (Medicare, Texas HICAP, Social Security, Senior Medicare Patrol)
 - Enrollment dates and how to enroll by phone
+- "Find my fit": an 8-question questionnaire and a 2027 yearly cost calculator comparing Plan G, Plan N, High-Deductible G and Advantage
 
 AI letter translation and Q&A run only when the page is opened inside Claude; on GitHub Pages those sections show a notice instead.
 

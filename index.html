@@ -112,6 +112,21 @@ small.src{color:var(--muted);font-size:.85rem}
 .pail .line{position:absolute;left:0;right:0;top:4px;text-align:center;font-size:.72rem;font-weight:700;color:var(--muted);border-bottom:2px dashed var(--muted);padding-bottom:2px}
 .ok-t{color:var(--ok)}
 ul.small{font-size:.95rem}
+.quiz{display:grid;gap:18px}
+.q{display:grid;gap:8px;border:0;margin:0;padding:0;min-width:0}
+.q legend{font-weight:700;padding:0;margin-bottom:4px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;width:1px;height:1px}
+.opt span{display:block;padding:10px 16px;border:1.5px solid var(--line);border-radius:999px;background:var(--paper);font-weight:500;cursor:pointer}
+.opt input:checked+span{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.opt input:focus-visible+span{outline:3px solid var(--accent);outline-offset:2px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px}
+.lean{display:grid;gap:10px;border-radius:12px;padding:16px;background:var(--accent-soft)}
+.meter{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;font-size:.92rem;font-weight:700}
+.meter .bar{height:12px;border-radius:999px;background:var(--line);position:relative;overflow:hidden}
+.meter .fill{position:absolute;top:0;bottom:0;left:0;background:var(--accent);border-radius:999px}
+.best{color:var(--ok);font-weight:700}
 @media (prefers-reduced-motion:no-preference){.water{animation:fill 1.2s ease-out}@keyframes fill{from{height:8%}}}
 @media (prefers-reduced-motion:no-preference){.tab,.btn{transition:background .15s}}
 </style>
@@ -131,6 +146,7 @@ ul.small{font-size:.95rem}
 <nav aria-label="Sections"><div class="tabs" role="tablist">
   <button class="tab" role="tab" data-tab="basics" aria-selected="true"><span class="ko">기본 이해</span><span class="en">Basics</span></button>
   <button class="tab" role="tab" data-tab="compare" aria-selected="false"><span class="ko">어드밴티지 vs 서플먼트</span><span class="en">Advantage vs Supplement</span></button>
+  <button class="tab" role="tab" data-tab="chooser" aria-selected="false"><span class="ko">나에게 맞는 선택</span><span class="en">Find my fit</span></button>
   <button class="tab" role="tab" data-tab="help" aria-selected="false"><span class="ko">약값·보험료 지원</span><span class="en">Help paying</span></button>
   <button class="tab" role="tab" data-tab="translate" aria-selected="false"><span class="ko">서류 번역·질문</span><span class="en">Translate & ask</span></button>
   <button class="tab" role="tab" data-tab="scam" aria-selected="false"><span class="ko">사기 주의</span><span class="en">Scam check</span></button>
@@ -270,6 +286,36 @@ ul.small{font-size:.95rem}
   <div class="alertbox"><b><span class="ko">가장 중요한 경고: 서플먼트 가입 시기</span><span class="en">Most important warning: when to buy a supplement</span></b><br>
   <span class="ko">65세 이상이면서 Part B가 시작된 달부터 <b>6개월</b>이 서플먼트 "개방 가입 기간"입니다. 이 기간에는 건강 상태 때문에 거절당하거나 더 비싸게 낼 수 없습니다. 이 기간이 지나면 보험사가 건강 질문을 하고 거절하거나 보험료를 올릴 수 있습니다. 그래서 "일단 어드밴티지로 갔다가 나중에 서플먼트로 바꾸자"가 생각처럼 쉽지 않을 수 있습니다. 바꾸기 전에 꼭 텍사스 무료 상담(HICAP)에 확인하세요.</span>
   <span class="en">Your Medigap Open Enrollment Period is the <b>6 months</b> starting the month you are 65 or older and enrolled in Part B. During it, companies can't refuse you or charge more for health problems. After it, they can generally ask health questions and refuse or charge more. So "start with Advantage and switch to a supplement later" may not work. Check with Texas HICAP (free) before you switch.</span></div>
+</section>
+
+<!-- CHOOSER -->
+<section id="chooser" role="tabpanel" hidden>
+  <p class="lead"><span class="ko">두 단계입니다. ① 질문 8개에 답하면 어느 쪽이 맞을지 방향을 알려드리고, ② 받은 견적을 넣으면 1년에 실제로 얼마가 나가는지 계산해 드립니다.</span><span class="en">Two steps. (1) Answer 8 questions to see which direction fits you. (2) Enter the quotes you got to see what each option really costs per year.</span></p>
+
+  <form class="tool" id="qzForm">
+    <h2><span class="ko">① 설문: 나에게 맞는 방향</span><span class="en">Step 1 · Questions: which direction fits</span></h2>
+    <div id="qzBox" class="quiz"></div>
+    <button class="btn" type="submit"><span class="ko">결과 보기</span><span class="en">See result</span></button>
+    <div id="qzOut" aria-live="polite"></div>
+  </form>
+
+  <form class="tool" id="calcForm">
+    <h2><span class="ko">② 1년 비용 계산기 (2027 기준)</span><span class="en">Step 2 · Yearly cost calculator (2027)</span></h2>
+    <p class="fit"><span class="ko">예시 숫자가 들어 있습니다. 보험사·HICAP·Medicare.gov에서 받은 <b>본인 견적</b>으로 바꾸세요. Part B 보험료(월 약 $209.50)는 어느 쪽이든 똑같이 내므로 계산에서 뺐습니다.</span><span class="en">Example numbers are filled in. Replace them with <b>your own quotes</b> from insurers, HICAP or Medicare.gov. The Part B premium (about $209.50/month) is the same on every path, so it is left out.</span></p>
+    <div class="grid2">
+      <label for="c-g"><span class="ko">Plan G 월 보험료 ($)</span><span class="en">Plan G monthly premium ($)</span><input id="c-g" type="number" min="0" inputmode="decimal" value="180"></label>
+      <label for="c-n"><span class="ko">Plan N 월 보험료 ($)</span><span class="en">Plan N monthly premium ($)</span><input id="c-n" type="number" min="0" inputmode="decimal" value="130"></label>
+      <label for="c-h"><span class="ko">하이디덕 G 월 보험료 ($)</span><span class="en">High-Deductible G monthly premium ($)</span><input id="c-h" type="number" min="0" inputmode="decimal" value="55"></label>
+      <label for="c-d"><span class="ko">Part D 월 보험료 ($) — 서플먼트 쪽만</span><span class="en">Part D monthly premium ($) — supplement paths only</span><input id="c-d" type="number" min="0" inputmode="decimal" value="40"></label>
+      <label for="c-ma"><span class="ko">어드밴티지 월 보험료 ($)</span><span class="en">Advantage monthly premium ($)</span><input id="c-ma" type="number" min="0" inputmode="decimal" value="0"></label>
+      <label for="c-mac"><span class="ko">어드밴티지 진료 1회 코페이 ($)</span><span class="en">Advantage copay per visit ($)</span><input id="c-mac" type="number" min="0" inputmode="decimal" value="20"></label>
+      <label for="c-moop"><span class="ko">어드밴티지 연간 상한 ($, 네트워크 안)</span><span class="en">Advantage yearly out-of-pocket max ($, in-network)</span><input id="c-moop" type="number" min="0" max="9850" inputmode="decimal" value="5900"></label>
+      <label for="c-v"><span class="ko">1년 예상 진료 횟수</span><span class="en">Doctor visits per year</span><input id="c-v" type="number" min="0" inputmode="numeric" value="8"></label>
+    </div>
+    <button class="btn" type="submit"><span class="ko">계산하기</span><span class="en">Calculate</span></button>
+    <div id="calcOut" aria-live="polite"></div>
+    <small class="src"><span class="ko">계산 가정: 진료 1회당 메디케어 인정 금액 약 $150. "많이 아픈 해"는 입원 1회(Part A 디덕티블 $1,736, 2026 금액 사용) + 외래·검사 $30,000으로 가정. Plan N은 진료 1회 최대 $20 코페이로 계산했고, 초과청구(excess charge)는 포함하지 않았습니다. 어드밴티지 "많이 아픈 해"는 연간 상한까지 낸다고 가정. 약값 본인부담(최대 $2,400)은 어느 쪽이든 비슷하게 상한이 있어 제외했습니다. 실제 금액은 플랜마다 다릅니다.</span><span class="en">Assumptions: about $150 Medicare-approved per visit. "Bad year" = one hospital stay (Part A deductible $1,736, 2026 figure) plus $30,000 of outpatient care and tests. Plan N uses up to $20 per visit and excludes excess charges. Advantage "bad year" assumes you reach the plan's cap. Drug out-of-pocket costs (capped at $2,400) are left out since every path has that cap. Real costs vary by plan.</span></small>
+  </form>
 </section>
 
 <!-- HELP -->
@@ -443,6 +489,96 @@ ul.small{font-size:.95rem}
   }});
   function selectTel(b){var t=b.parentNode.querySelector('.tel');var r=document.createRange();r.selectNodeContents(t);var s=getSelection();s.removeAllRanges();s.addRange(r);}
 
+  /* Plan chooser: questionnaire */
+  var QS=[
+    {id:'win',ko:'Part B가 시작된 지 6개월이 안 됐나요? (서플먼트 개방 가입 기간)',en:'Did your Part B start less than 6 months ago? (Medigap open enrollment)',o:[['y','예','Yes'],['n','아니요','No'],['u','잘 모름','Not sure']]},
+    {id:'vis',ko:'1년에 병원(의사) 몇 번 가세요?',en:'How many doctor visits a year?',o:[['f','0–4번','0–4'],['s','5–12번','5–12'],['m','13번 이상','13+']]},
+    {id:'chr',ko:'지병(당뇨, 심장, 암 등)이 있거나 수술 계획이 있나요?',en:'Do you have a chronic condition (diabetes, heart, cancer) or a planned surgery?',o:[['y','예','Yes'],['n','아니요','No']]},
+    {id:'trv',ko:'1년에 몇 달씩 텍사스 밖(자녀 집, 다른 주)에 머무시나요?',en:'Do you spend months outside Texas each year?',o:[['y','예','Yes'],['n','아니요','No']]},
+    {id:'doc',ko:'지금 다니는 의사를 꼭 계속 보고 싶으신가요?',en:'Must you keep your current doctors?',o:[['y','예','Yes'],['n','상관없음','Not important']]},
+    {id:'bud',ko:'매달 보험료로 낼 수 있는 여유는?',en:'How much can you spend on monthly premiums?',o:[['l','최소로','As little as possible'],['m','보통','Moderate'],['h','넉넉함','Comfortable']]},
+    {id:'rx',ko:'한 달 약값은 어느 정도인가요?',en:'Monthly drug costs?',o:[['l','$100 미만','Under $100'],['m','$100–500','$100–500'],['h','$500 이상','Over $500']]},
+    {id:'inc',ko:'한 달 소득이 1인 약 $2,000, 부부 약 $2,700 이하인가요?',en:'Is monthly income under about $2,000 (single) or $2,700 (couple)?',o:[['y','예','Yes'],['n','아니요','No'],['u','잘 모름','Not sure']]}
+  ];
+  var DEF={win:'y',vis:'s',chr:'n',trv:'n',doc:'y',bud:'m',rx:'m',inc:'n'};
+  function buildQuiz(){
+    var box=document.getElementById('qzBox'), prev=readQuiz()||DEF; box.innerHTML='';
+    QS.forEach(function(q,i){
+      var fs=document.createElement('fieldset');fs.className='q';
+      var lg=document.createElement('legend');lg.textContent=(i+1)+'. '+q[lang];fs.appendChild(lg);
+      var op=document.createElement('div');op.className='opts';
+      q.o.forEach(function(o){var l=document.createElement('label');l.className='opt';
+        var r=document.createElement('input');r.type='radio';r.name='q-'+q.id;r.id='q-'+q.id+'-'+o[0];r.value=o[0];if(prev[q.id]===o[0])r.checked=true;
+        var s=document.createElement('span');s.textContent=lang==='ko'?o[1]:o[2];l.appendChild(r);l.appendChild(s);op.appendChild(l);});
+      fs.appendChild(op);box.appendChild(fs);});
+  }
+  function readQuiz(){var a={},any=false;QS.forEach(function(q){var c=document.querySelector('input[name="q-'+q.id+'"]:checked');if(c){a[q.id]=c.value;any=true;}});return any?a:null;}
+  var quizShown=false;
+  function renderQuiz(){
+    var a=readQuiz()||DEF, ko=lang==='ko', sup=0, ma=0, why=[], warn=[];
+    function r(k,e){why.push(ko?k:e)}
+    if(a.vis==='m'){sup+=2;r('병원에 자주 가시면 진료마다 내는 돈이 적은 서플먼트가 유리합니다.','Frequent visits favor a supplement, where each visit costs little.')}
+    else if(a.vis==='s'){sup+=1}
+    else {ma+=1;r('병원에 거의 안 가시면 보험료가 낮은 쪽이 1년 총액이 적을 수 있습니다.','With few visits, low-premium options can cost less over the year.')}
+    if(a.chr==='y'){sup+=2;r('지병이나 수술 계획이 있으면 "많이 아픈 해" 비용이 예측 가능한 서플먼트가 안전합니다.','With a condition or planned surgery, a supplement keeps a bad year predictable.')}
+    if(a.trv==='y'){sup+=2;r('텍사스 밖에 오래 계시면 네트워크 제한이 없는 오리지널+서플먼트가 편합니다.','Long stays outside Texas favor Original Medicare + supplement, which has no network.')}
+    if(a.doc==='y'){sup+=1;r('다니는 의사를 꼭 유지하려면, 어드밴티지는 그 의사가 네트워크 안에 있는지 반드시 확인해야 합니다.','To keep your doctors on Advantage, confirm each one is in the network.')}
+    if(a.bud==='l'){ma+=2;r('보험료 부담을 최소로 하려면 어드밴티지나 하이디덕 G가 후보입니다.','To keep premiums low, look at Advantage or High-Deductible G.')}
+    else if(a.bud==='h'){sup+=1}
+    if(a.win==='n'){ma+=1;warn.push(ko?'서플먼트 개방 가입 기간이 지났다면 건강 심사로 거절되거나 비싸질 수 있습니다. 가입 전에 승인되는지 먼저 확인하세요.':'Your Medigap open enrollment has passed, so you may be refused or charged more. Get approved before dropping any coverage.')}
+    if(a.win==='y') warn.push(ko?'지금이 서플먼트를 건강 심사 없이 들 수 있는 기간입니다. 서플먼트를 고려한다면 이 기간을 놓치지 마세요.':'You are in the window to buy a supplement with no health questions. If you are considering one, don\'t let it pass.');
+    if(a.win==='u') warn.push(ko?'Part B 시작일은 메디케어 카드에 적혀 있습니다. 6개월이 안 됐다면 서플먼트를 심사 없이 들 수 있습니다.':'Your Part B start date is on your Medicare card. Within 6 months, you can buy a supplement with no health questions.');
+    if(a.rx==='h') warn.push(ko?'약값이 많으면 어느 쪽이든 Part D 상한 $2,400(2027)이 적용됩니다. 내 약이 플랜 목록에 있는지 Medicare.gov 플랜 비교기로 꼭 확인하세요.':'With high drug costs, every path has the $2,400 Part D cap (2027). Check that your drugs are on the plan\'s list with the Medicare.gov Plan Finder.');
+    var first=(a.inc!=='n');
+    var total=sup+ma||1, pct=Math.round(sup/total*100);
+    var dir = sup>ma+1 ? 'sup' : (ma>sup+1 ? 'ma' : 'mid');
+    var sub='';
+    if(dir!=='ma'){ sub = (a.vis==='m'||a.chr==='y') ? 'G' : (a.vis==='f'&&a.bud!=='h') ? 'HDG' : 'N'; }
+    var SUBTXT={G:ko?'Plan G (진료가 많거나 지병이 있으면 가장 마음 편함)':'Plan G (most predictable with frequent care or a condition)',N:ko?'Plan N (G보다 싸고, 진료 1회 최대 $20 부담)':'Plan N (cheaper than G; up to $20 per visit)',HDG:ko?'하이디덕 G (보험료 최저, 아픈 해엔 최대 $3,050)':'High-Deductible G (lowest premium; up to $3,050 in a bad year)'};
+    var head = dir==='sup' ? (ko?'오리지널 메디케어 + 서플먼트 쪽으로 기웁니다':'You lean toward Original Medicare + Supplement')
+             : dir==='ma' ? (ko?'메디케어 어드밴티지 쪽으로 기웁니다':'You lean toward Medicare Advantage')
+             : (ko?'두 쪽이 비슷합니다. ② 계산기로 숫자를 비교해 보세요':'Both paths are close. Compare numbers in Step 2.');
+    var h='<div class="lean">';
+    if(first) h+='<div class="note"><b>'+(ko?'먼저 확인하세요':'Check this first')+'</b><br>'+(ko?'소득이 기준 근처라면 엑스트라 헬프·MSP·메디케이드로 보험료와 약값이 크게 줄 수 있습니다. 이게 플랜 선택보다 먼저입니다. "약값·보험료 지원" 탭에서 점검해 보세요.':'If your income is near the limits, Extra Help, MSP or Medicaid can cut premiums and drug costs a lot. Check this before choosing a plan, in the "Help paying" tab.')+'</div>';
+    h+='<h3>'+head+'</h3>';
+    h+='<div class="meter"><span>'+(ko?'어드밴티지':'Advantage')+'</span><span class="bar"><span class="fill" style="width:'+pct+'%"></span></span><span>'+(ko?'서플먼트':'Supplement')+'</span></div>';
+    if(sub) h+='<p><b>'+(ko?'서플먼트 중에서는: ':'Among supplements: ')+'</b>'+SUBTXT[sub]+'</p>';
+    if(why.length) h+='<ul class="clean">'+why.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul>';
+    if(warn.length) h+='<div class="alertbox">'+warn.map(function(x){return '<p>'+x+'</p>'}).join('')+'</div>';
+    h+='<small class="src">'+(ko?'이 결과는 방향을 잡기 위한 참고이며, 특정 보험사 추천이 아닙니다. 결정 전 텍사스 HICAP(1-800-252-9240) 무료 상담을 받으세요.':'This is a starting direction, not a recommendation of any company. Talk to Texas HICAP (1-800-252-9240, free) before deciding.')+'</small></div>';
+    var out=document.getElementById('qzOut'); out.innerHTML=h; quizShown=true;
+  }
+  document.getElementById('qzForm').addEventListener('submit',function(e){e.preventDefault();renderQuiz();});
+
+  /* Plan chooser: yearly cost calculator (2027) */
+  var PB_DED=292, HDG_DED=3050, PA_DED=1736, VISIT=150, BAD_B=30000;
+  function num(id){var v=parseFloat(document.getElementById(id).value);return isFinite(v)&&v>=0?v:0}
+  function renderCalc(){
+    var ko=lang==='ko', g=num('c-g'), n=num('c-n'), hd=num('c-h'), d=num('c-d'), m=num('c-ma'), mc=num('c-mac'), moop=Math.min(num('c-moop'),9850), v=Math.round(num('c-v'));
+    var light=v*VISIT, origLight=Math.min(light,PB_DED)+0.2*Math.max(light-PB_DED,0), origBad=PA_DED+PB_DED+0.2*(BAD_B-PB_DED);
+    var rows=[
+      {k:ko?'Plan G + Part D':'Plan G + Part D', l:(g+d)*12+Math.min(light,PB_DED), b:(g+d)*12+PB_DED},
+      {k:ko?'Plan N + Part D':'Plan N + Part D', l:(n+d)*12+Math.min(light,PB_DED)+v*20, b:(n+d)*12+PB_DED+v*20},
+      {k:ko?'하이디덕 G + Part D':'High-Ded. G + Part D', l:(hd+d)*12+Math.min(origLight,HDG_DED), b:(hd+d)*12+Math.min(origBad,HDG_DED)},
+      {k:ko?'어드밴티지 (약 포함)':'Advantage (drugs incl.)', l:m*12+Math.min(v*mc,moop), b:m*12+moop}
+    ];
+    var minL=Math.min.apply(null,rows.map(function(r){return r.l})), minB=Math.min.apply(null,rows.map(function(r){return r.b}));
+    var f=function(x){return '$'+Math.round(x).toLocaleString('en-US')};
+    var h='<div class="tablewrap"><table><thead><tr><th>'+(ko?'선택':'Option')+'</th><th>'+(ko?'가벼운 해 (진료 ':'Light year (')+v+(ko?'회)':' visits)')+'</th><th>'+(ko?'많이 아픈 해':'Bad year')+'</th></tr></thead><tbody>';
+    rows.forEach(function(r){h+='<tr><td>'+r.k+'</td><td class="num'+(r.l===minL?' best':'')+'">'+f(r.l)+'</td><td class="num'+(r.b===minB?' best':'')+'">'+f(r.b)+'</td></tr>'});
+    h+='</tbody></table></div>';
+    var gap=(g-hd)*12;
+    h+='<p class="fit">'+(ko?('<b class="best">초록색</b>이 그 상황에서 가장 적게 나가는 선택입니다. Plan G와 하이디덕 G의 1년 보험료 차이는 '+f(gap)+'입니다. 이 차이가 약 $2,750보다 크면, 많이 아픈 해에도 하이디덕 G가 손해가 아닙니다.'):('<b class="best">Green</b> is the lowest cost in that scenario. The yearly premium gap between Plan G and High-Deductible G is '+f(gap)+'. If it is more than about $2,750, High-Deductible G costs no more even in a bad year.'))+'</p>';
+    document.getElementById('calcOut').innerHTML=h;
+  }
+  document.getElementById('calcForm').addEventListener('submit',function(e){e.preventDefault();renderCalc();});
+  ['c-g','c-n','c-h','c-d','c-ma','c-mac','c-moop','c-v'].forEach(function(id){document.getElementById(id).addEventListener('input',renderCalc)});
+
+  var _setLang=setLang;
+  setLang=function(l){_setLang(l);buildQuiz();if(quizShown)renderQuiz();renderCalc();};
+  document.getElementById('btn-ko').onclick=function(){setLang('ko')};
+  document.getElementById('btn-en').onclick=function(){setLang('en')};
+
   setLang(lang);
 
   /* AI: grounded translation and Q&A */
@@ -455,6 +591,7 @@ ul.small{font-size:.95rem}
    'Medigap: Open Enrollment = 6 months starting the month you are 65+ and in Part B; no medical underwriting then. After that insurers can generally underwrite. Medigap does not cover drugs (needs Part D). Plan G covers all but Part B deductible; Plan F only for those eligible before 2020. Cannot use Medigap with Advantage.',
    'Extra Help 2026 limits: income $23,940 single / $32,460 married per year; resources $18,090 / $36,100. 2027 Extra Help: $0 premium on qualifying plans, $0 deductible, max $5.80 generic / $14.40 brand. Apply via ssa.gov. MSP qualifiers get Extra Help automatically. Texas MSP/Medicaid via HHSC 1-800-252-9240.',
    'People with Medicare generally cannot use ACA Marketplace plans.',
+   'Choosing: Original Medicare + supplement suits frequent care, chronic conditions, travel outside Texas, wanting any doctor; Advantage suits low premium budgets and few visits if your doctors are in network. If income is near Extra Help/MSP limits, check those first. The app has a "Find my fit" tab with a questionnaire and a yearly cost calculator.',
    'Two-bucket explanation: the deductible bucket, when full, lowers your share but not to zero; the out-of-pocket maximum bucket, when full, means $0 for the rest of the year. Original Medicare A/B has no out-of-pocket maximum. High-Deductible Plan G: deductible $2,950 (2026) / $3,050 (2027, CMS); after it, Plan G pays the rest. Plan N: like G but up to $20 office copay, up to $50 ER copay (waived if admitted), no coverage of Part B excess charges.',
    'Deductibles are not prepaid or billed separately: you pay full Medicare-approved cost of services until your payments reach the deductible, then 20% coinsurance (Part B). Resets Jan 1. Part A deductible is per benefit period (resets after 60 days out of hospital). Advantage plans often use flat copays instead.',
    'Enrolling: Part A/B via Social Security (1-800-772-1213, ssa.gov); Advantage/Part D via 1-800-MEDICARE or the Medicare.gov Plan Finder; Medigap by calling the insurer directly (same letter plan = same benefits at every company).',
