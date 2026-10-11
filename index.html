@@ -374,7 +374,7 @@ ul.small{font-size:.95rem}
     <div id="qaOut" class="out" aria-live="polite"><span class="ko">예시 질문이 들어 있습니다. 바꿔서 물어보세요.</span><span class="en">An example question is filled in. Change it to yours.</span></div>
     <small class="src"><span class="ko">답변은 이 앱에 정리된 공식 자료를 근거로 합니다. 개인 결정 전에는 HICAP(무료)에 확인하세요.</span><span class="en">Answers are based on the official facts in this app. Confirm with HICAP (free) before deciding.</span></small>
   </form>
-  <p id="aiOff" class="note" hidden><span class="ko">이 화면에서는 AI 번역 기능을 쓸 수 없습니다. Claude 앱이나 claude.ai에서 열어 주세요.</span><span class="en">AI translation isn't available in this view. Open the page in the Claude app or claude.ai.</span></p>
+  <p id="aiOff" class="note" hidden><span class="ko">AI 번역 기능을 잠시 쓸 수 없습니다. 잠시 후 다시 열어 주세요. 급하면 HICAP(무료) 1-800-252-9240에 전화하세요.</span><span class="en">AI translation is temporarily unavailable. Please try again later, or call HICAP (free) at 1-800-252-9240.</span></p>
 </section>
 
 <!-- SCAM -->
@@ -600,19 +600,16 @@ ul.small{font-size:.95rem}
    'Scams: Medicare does not call unprompted asking for numbers; agents may not make unsolicited calls or door visits; offers of gifts or free medical items for your number are red flags.'
   ].join('\n');
 
-  var sampleFn=null;
+  // AI runs on the HAKOYA server (Supabase Edge Function medicare-ai). Set AI_URL after deploy.
+  var AI_URL='https://iysucuvufdtcmdbvqbfv.supabase.co/functions/v1/medicare-ai';
+  // Public anon key (safe to ship; it only lets the page call the function).
+  var AI_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5c3VjdXZ1ZmR0Y21kYnZxYmZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE3MzMyNzYsImV4cCI6MjEwNzMwOTI3Nn0.2lG98e8qbewrewwbrCUR3QsGzjdWkm_YBRfwXxknA8E';
   function hideAI(){document.getElementById('trForm').hidden=true;document.getElementById('qaForm').hidden=true;document.getElementById('aiOff').hidden=false;}
-  if(window.claude&&claude.use){
-    claude.use('sample').then(function(s){
-      if(!s){hideAI();return;}
-      sampleFn=s;
-      s.limits().then(function(c){if(!c||!c.images) document.getElementById('tr-img-wrap').hidden=true;},function(){document.getElementById('tr-img-wrap').hidden=true;});
-    });
-  } else hideAI();
+  if(!AI_URL) hideAI();
 
   function errText(e){
     var c=e&&e.code, ko=lang==='ko';
-    if(c==='not_granted'||c==='sampling_disabled'){hideAI();return ko?'AI 사용이 허용되지 않았습니다.':'AI use was not allowed.';}
+    if(c==='not_configured'||c==='forbidden'){hideAI();return ko?'AI 기능이 아직 준비되지 않았습니다.':'AI is not set up yet.';}
     if(c==='rate_limited') return ko?'요청이 많습니다. 잠시 후 다시 눌러 주세요.':'Too many requests. Try again in a little while.';
     if(c==='image_rejected') return ko?'사진을 읽을 수 없습니다. 다른 사진을 올려 주세요.':'That photo could not be read. Try another one.';
     if(c==='prompt_too_large') return ko?'글이 너무 깁니다. 한 페이지씩 나눠서 올려 주세요.':'Too long. Send one page at a time.';
@@ -620,35 +617,50 @@ ul.small{font-size:.95rem}
     return ko?'연결이 끊겼습니다. 다시 눌러 주세요.':'Connection problem. Please try again.';
   }
 
-  function run(btn,stop,out,input,opts){
-    var ctl=new AbortController(); opts.signal=ctl.signal;
-    opts.onText=function(u){out.textContent=u.text};
+  // Shrink phone photos before upload (max 1600px, JPEG).
+  function shrink(file){
+    return new Promise(function(ok,bad){
+      var img=new Image(), url=URL.createObjectURL(file);
+      img.onload=function(){
+        var m=1600, w=img.naturalWidth, h=img.naturalHeight, k=Math.min(1,m/Math.max(w,h));
+        var c=document.createElement('canvas'); c.width=Math.round(w*k); c.height=Math.round(h*k);
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url);
+        ok({type:'image/jpeg',data:c.toDataURL('image/jpeg',0.85).split(',')[1]});
+      };
+      img.onerror=function(){URL.revokeObjectURL(url);bad({code:'image_rejected'})};
+      img.src=url;
+    });
+  }
+
+  function run(btn,stop,out,payload,files){
+    var ctl=new AbortController();
     btn.disabled=true; stop.hidden=false; out.textContent=lang==='ko'?'생각하는 중…':'Thinking…';
     stop.onclick=function(){ctl.abort()};
-    sampleFn(input,opts).then(function(r){if(r.truncated) out.textContent+=(lang==='ko'?'\n\n(길어서 잘렸습니다. 나눠서 올려 주세요.)':'\n\n(Cut short. Send less at a time.)');},
-      function(e){ if(e&&e.code==='cancelled'){out.textContent=e.text||'';return;} out.textContent=(e&&e.text?e.text+'\n\n':'')+errText(e);})
+    payload.lang=lang; payload.facts=FACTS;
+    Promise.all([].slice.call(files||[],0,4).map(shrink))
+     .then(function(imgs){payload.images=imgs;
+        return fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+AI_KEY,'apikey':AI_KEY},body:JSON.stringify(payload),signal:ctl.signal});})
+     .then(function(r){return r.json().catch(function(){return {code:'upstream'}});})
+     .then(function(d){
+        if(!d||!d.text) throw d;
+        out.textContent=d.text+(d.truncated?(lang==='ko'?'\n\n(길어서 잘렸습니다. 나눠서 올려 주세요.)':'\n\n(Cut short. Send less at a time.)'):'');
+      })
+     .catch(function(e){ if(e&&e.name==='AbortError'){out.textContent=lang==='ko'?'멈췄습니다.':'Stopped.';return;} out.textContent=errText(e); })
      .then(function(){btn.disabled=false;stop.hidden=true;});
   }
 
   document.getElementById('trForm').addEventListener('submit',function(e){
-    e.preventDefault(); if(!sampleFn) return;
+    e.preventDefault(); if(!AI_URL) return;
     var txt=document.getElementById('tr-text').value.trim(), files=document.getElementById('tr-img').files, out=document.getElementById('trOut');
     if(!txt&&!(files&&files.length)){out.textContent=lang==='ko'?'서류 내용을 붙여넣거나 사진을 올려 주세요.':'Paste the letter or add a photo first.';return;}
-    var target=lang==='ko'?'Korean (polite 존댓말, simple words a Korean senior understands)':'plain simple English';
-    var prompt='You help Korean-American seniors in Texas understand Medicare paperwork. Answer in '+target+'. Do not sell or recommend any specific company. If an ID number (Medicare, SSN, bank) appears, do not repeat it.\n\n'+FACTS+
-      '\n\nThe user sent a document'+(files&&files.length?' (see the attached photo(s))':'')+'. Reply with these short sections:\n1. What this is (who sent it, what kind of letter)\n2. Translation of the important parts\n3. What I need to do, and the deadline (or "No action needed")\n4. Scam warning signs (or "None seen")\n5. Who to call if unsure (use the phones in FACTS)\nPlain text, no tables.'+
-      (txt?'\n\nDOCUMENT TEXT:\n'+txt.slice(0,20000):'');
-    var opts={}; if(files&&files.length) opts.images=[].slice.call(files,0,4);
-    run(document.getElementById('tr-go'),document.getElementById('tr-stop'),out,prompt,opts);
+    run(document.getElementById('tr-go'),document.getElementById('tr-stop'),out,{mode:'translate',text:txt.slice(0,20000)},files);
   });
 
   document.getElementById('qaForm').addEventListener('submit',function(e){
-    e.preventDefault(); if(!sampleFn) return;
+    e.preventDefault(); if(!AI_URL) return;
     var q=document.getElementById('qa-q').value.trim(), out=document.getElementById('qaOut');
     if(!q){out.textContent=lang==='ko'?'질문을 적어 주세요.':'Type a question first.';return;}
-    var target=lang==='ko'?'Korean (polite 존댓말, simple words)':'plain simple English';
-    var prompt='You are a neutral Medicare guide for Korean-American seniors in Texas. Answer in '+target+', in under 250 words. Use only the FACTS below for numbers and rules; if the answer depends on details not given (their drugs, doctors, income), say what to check and point to the Medicare.gov Plan Finder or Texas HICAP 1-800-252-9240. Never recommend a specific insurance company. Not legal or financial advice.\n\n'+FACTS+'\n\nQUESTION:\n'+q.slice(0,4000);
-    run(document.getElementById('qa-go'),document.getElementById('qa-stop'),out,prompt,{cache:false});
+    run(document.getElementById('qa-go'),document.getElementById('qa-stop'),out,{mode:'qa',text:q.slice(0,4000)});
   });
 })();
 </script>
