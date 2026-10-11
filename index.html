@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>메디케어 길라잡이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: one calm column, big type for seniors; sticky tab bar; facts carry their status (official / projected) */
+:root{
+  --paper:#f5f6f2; --card:#ffffff; --ink:#1a2320; --muted:#55615b; --line:#d8ddd6;
+  --accent:#1d5a4c; --accent-soft:#e3eee9; --on-accent:#ffffff;
+  --warn:#8a5a00; --warn-soft:#fbf1dc; --alert:#a8241c; --alert-soft:#fbe7e5; --ok:#1f6b3a; --ok-soft:#e2f2e7;
+  --display:"Gowun Batang","Nanum Myeongjo",Georgia,serif;
+  --body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#121816; --card:#1a2220; --ink:#e7ece9; --muted:#a2aea8; --line:#2f3a36;
+  --accent:#7cc4ad; --accent-soft:#1f322c; --on-accent:#0d1412;
+  --warn:#e7b85a; --warn-soft:#2f2614; --alert:#f08b82; --alert-soft:#371c1a; --ok:#86d29e; --ok-soft:#18301f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121816; --card:#1a2220; --ink:#e7ece9; --muted:#a2aea8; --line:#2f3a36;
+  --accent:#7cc4ad; --accent-soft:#1f322c; --on-accent:#0d1412;
+  --warn:#e7b85a; --warn-soft:#2f2614; --alert:#f08b82; --alert-soft:#371c1a; --ok:#86d29e; --ok-soft:#18301f; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.7;-webkit-text-size-adjust:100%}
+.wrap{max-width:760px;margin:0 auto;padding-inline:18px;padding-block:20px 64px}
+body.en .ko, body:not(.en) .en{display:none!important}
+h1,h2,h3{font-family:var(--display);line-height:1.3;text-wrap:balance;margin:0}
+h1{font-size:2rem}
+h2{font-size:1.55rem;margin-bottom:.5rem}
+h3{font-size:1.2rem}
+p{margin:0}
+a{color:var(--accent)}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:2px solid var(--ink)}
+.sub{color:var(--muted);font-size:1rem}
+.lang{display:flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden}
+.lang button{all:unset;cursor:pointer;padding:8px 16px;font-weight:700;font-size:1rem}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);margin-inline:-18px;padding:10px 18px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.tabs{display:flex;gap:8px;width:max-content}
+.tab{all:unset;cursor:pointer;padding:10px 16px;border-radius:12px;font-weight:700;font-size:1.02rem;white-space:nowrap;border:1.5px solid var(--line);background:var(--card)}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.tab:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+section{display:grid;gap:22px;padding-top:22px}
+.lead{font-size:1.1rem}
+.block{display:grid;gap:10px}
+.parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.part{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:6px;min-width:0}
+.part b.tag{font-family:var(--display);font-size:1.6rem;color:var(--accent);line-height:1}
+.term{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;padding:14px 0;border-top:1px solid var(--line)}
+.term:last-child{border-bottom:1px solid var(--line)}
+.term dt{font-weight:700;grid-column:1/-1}
+.term dd{margin:0;color:var(--ink)}
+.term .eng{color:var(--muted);font-weight:400;font-size:.92rem;margin-left:6px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:.98rem}
+th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:none}
+th{font-weight:700;background:var(--accent-soft)}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:700}
+.pill{display:inline-block;font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.pill.off{background:var(--ok-soft);color:var(--ok)}
+.pill.proj{background:var(--warn-soft);color:var(--warn)}
+.note{background:var(--warn-soft);color:var(--ink);border-radius:12px;padding:14px 16px;font-size:1rem}
+.note b{color:var(--warn)}
+.alertbox{background:var(--alert-soft);border-radius:12px;padding:14px 16px}
+.alertbox b{color:var(--alert)}
+ul.clean{margin:0;padding-left:1.2em;display:grid;gap:8px}
+.vs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.side{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:10px;align-content:start;min-width:0}
+.side h3{color:var(--accent)}
+.fit{font-size:.98rem;color:var(--muted)}
+form.tool{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:14px}
+label{font-weight:700;display:grid;gap:6px}
+input,select,textarea{font:inherit;font-size:1.05rem;padding:12px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);width:100%;box-sizing:border-box}
+textarea{min-height:160px;resize:vertical}
+.btn{all:unset;cursor:pointer;background:var(--accent);color:var(--on-accent);font-weight:700;padding:14px 20px;border-radius:12px;text-align:center;font-size:1.05rem}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.btn[disabled]{opacity:.5;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.result{border-radius:12px;padding:16px;display:grid;gap:8px}
+.result.yes{background:var(--ok-soft)}
+.result.maybe{background:var(--warn-soft)}
+.out{white-space:pre-wrap;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;min-height:3em;overflow-wrap:anywhere}
+.dates{display:grid;gap:0}
+.date{display:grid;grid-template-columns:minmax(0,9.5em) 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.date:last-child{border-bottom:1px solid var(--line)}
+.date .when{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.contacts{display:grid;gap:10px}
+.contact{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
+.contact .tel{font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums;user-select:all}
+.copy{all:unset;cursor:pointer;font-size:.9rem;font-weight:700;color:var(--accent);border:1.5px solid var(--accent);border-radius:999px;padding:4px 12px}
+.check{display:grid;gap:10px}
+.check label{font-weight:400;display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer}
+.check input{width:24px;height:24px;flex:none;margin-top:3px}
+.scamresult{font-weight:700}
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem;display:grid;gap:8px}
+small.src{color:var(--muted);font-size:.85rem}
+.buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px}
+.bk{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;gap:16px;align-items:flex-start;min-width:0}
+.bk-text{display:grid;gap:8px;min-width:0}
+.pail{position:relative;flex:none;width:76px;height:96px;border:3px solid var(--ink);border-top:none;border-radius:0 0 22px 22px;overflow:hidden;margin-top:6px}
+.pail::before{content:"";position:absolute;left:-3px;right:-3px;top:0;border-top:3px solid var(--ink)}
+.water{position:absolute;left:0;right:0;bottom:0;background:var(--accent);opacity:.85}
+.w1{height:62%}
+.w2{height:88%}
+.pail .line{position:absolute;left:0;right:0;top:4px;text-align:center;font-size:.72rem;font-weight:700;color:var(--muted);border-bottom:2px dashed var(--muted);padding-bottom:2px}
+.ok-t{color:var(--ok)}
+ul.small{font-size:.95rem}
+@media (prefers-reduced-motion:no-preference){.water{animation:fill 1.2s ease-out}@keyframes fill{from{height:8%}}}
+@media (prefers-reduced-motion:no-preference){.tab,.btn{transition:background .15s}}
+</style>
+
+<div class="wrap">
+<header>
+  <div>
+    <h1><span class="ko">메디케어 길라잡이</span><span class="en">Medicare Guide</span></h1>
+    <p class="sub"><span class="ko">에이전트 없이, 내 말로 이해하는 메디케어 · 텍사스 기준</span><span class="en">Understand Medicare in plain words, without an agent · Texas edition</span></p>
+  </div>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" id="btn-ko" aria-pressed="true">한국어</button>
+    <button type="button" id="btn-en" aria-pressed="false">English</button>
+  </div>
+</header>
+
+<nav aria-label="Sections"><div class="tabs" role="tablist">
+  <button class="tab" role="tab" data-tab="basics" aria-selected="true"><span class="ko">기본 이해</span><span class="en">Basics</span></button>
+  <button class="tab" role="tab" data-tab="compare" aria-selected="false"><span class="ko">어드밴티지 vs 서플먼트</span><span class="en">Advantage vs Supplement</span></button>
+  <button class="tab" role="tab" data-tab="help" aria-selected="false"><span class="ko">약값·보험료 지원</span><span class="en">Help paying</span></button>
+  <button class="tab" role="tab" data-tab="translate" aria-selected="false"><span class="ko">서류 번역·질문</span><span class="en">Translate & ask</span></button>
+  <button class="tab" role="tab" data-tab="scam" aria-selected="false"><span class="ko">사기 주의</span><span class="en">Scam check</span></button>
+  <button class="tab" role="tab" data-tab="dates" aria-selected="false"><span class="ko">날짜·연락처</span><span class="en">Dates & phones</span></button>
+</div></nav>
+
+<!-- BASICS -->
+<section id="basics" role="tabpanel">
+  <p class="lead"><span class="ko">메디케어는 65세 이상(또는 특정 장애)인 분들을 위한 연방 건강보험입니다. 네 부분(Part)으로 나뉘어 있고, 이것만 알면 나머지는 쉬워집니다.</span><span class="en">Medicare is federal health insurance for people 65 and older (and some people with disabilities). It has four parts. Once you know them, the rest gets easier.</span></p>
+  <div class="parts">
+    <div class="part"><b class="tag">A</b><h3><span class="ko">병원 입원</span><span class="en">Hospital</span></h3><p><span class="ko">입원, 전문요양시설, 호스피스. 10년(40분기) 일하며 세금을 냈다면 대부분 월 보험료가 없습니다.</span><span class="en">Inpatient stays, skilled nursing, hospice. Most people who worked 10 years (40 quarters) pay no monthly premium.</span></p></div>
+    <div class="part"><b class="tag">B</b><h3><span class="ko">의사·외래</span><span class="en">Doctors & outpatient</span></h3><p><span class="ko">진료, 검사, 외래 치료, 예방접종. 매달 보험료를 냅니다(보통 소셜연금에서 자동 차감).</span><span class="en">Doctor visits, tests, outpatient care, preventive care. You pay a monthly premium, usually taken from your Social Security check.</span></p></div>
+    <div class="part"><b class="tag">C</b><h3><span class="ko">메디케어 어드밴티지</span><span class="en">Medicare Advantage</span></h3><p><span class="ko">민간 보험사가 A·B(대부분 D까지)를 묶어서 파는 플랜. "C"는 따로 드는 보험이 아니라 A·B를 대신 받는 방식입니다.</span><span class="en">Private plans that bundle A and B (usually D too). It replaces how you get A and B rather than adding to them.</span></p></div>
+    <div class="part"><b class="tag">D</b><h3><span class="ko">처방약</span><span class="en">Prescription drugs</span></h3><p><span class="ko">약값 보험. 민간 보험사가 팔고, 플랜마다 보장하는 약(포뮬러리)과 약국이 다릅니다.</span><span class="en">Drug coverage, sold by private companies. Each plan has its own drug list (formulary) and pharmacies.</span></p></div>
+  </div>
+
+  <div class="block">
+    <h2><span class="ko">꼭 알아야 할 용어 4개</span><span class="en">Four words you must know</span></h2>
+    <dl style="margin:0">
+      <div class="term"><dt><span class="ko">보험료</span><span class="eng">Premium</span></dt><dd><span class="ko">매달 내는 돈. 병원에 안 가도 냅니다.</span><span class="en">What you pay every month, even if you never see a doctor.</span></dd></div>
+      <div class="term"><dt><span class="ko">디덕티블 (본인 먼저 내는 금액)</span><span class="eng">Deductible</span></dt><dd><span class="ko">보험이 본격적으로 내주기 전에, 1년 동안 내가 먼저 다 내야 하는 금액.</span><span class="en">What you pay yourself each year before the plan starts paying its share.</span></dd></div>
+      <div class="term"><dt><span class="ko">본인부담 (코페이·코인슈런스)</span><span class="eng">Copay / Coinsurance</span></dt><dd><span class="ko">디덕티블을 채운 뒤에도 내는 몫. 코페이는 정액(예: $20), 코인슈런스는 비율(예: 20%).</span><span class="en">Your share after the deductible. A copay is a flat amount ($20); coinsurance is a percent (20%).</span></dd></div>
+      <div class="term"><dt><span class="ko">연간 본인부담 상한</span><span class="eng">Out-of-pocket maximum</span></dt><dd><span class="ko">1년에 내가 낼 수 있는 최대 금액. 여기까지 내면 그 해 나머지는 보험이 냅니다. 오리지널 메디케어(A·B)에는 이 상한이 없습니다.</span><span class="en">The most you pay in a year; after that the plan pays. Original Medicare (A and B) has no such cap.</span></dd></div>
+    </dl>
+    <div class="note"><b><span class="ko">에이전트가 흔히 흐리는 부분</span><span class="en">What sales pitches blur</span></b><br><span class="ko">"보험료 $0" 플랜은 대신 디덕티블이나 본인부담이 높은 경우가 많습니다. 보험료만 보지 말고 <b>1년 총비용 = 보험료×12 + 예상 본인부담</b>으로 비교하세요.</span><span class="en">"$0 premium" plans often have higher deductibles or copays. Compare the <b>yearly total = premium × 12 + expected out-of-pocket</b>, not the premium alone.</span></div>
+  </div>
+
+  <div class="block">
+    <h2><span class="ko">버킷 두 개로 이해하기</span><span class="en">Think of two buckets</span></h2>
+    <p><span class="ko">내가 병원비·약값으로 내는 돈은 버킷에 물을 붓는 것과 같습니다. 버킷은 두 종류가 있고, 다 찼을 때 일어나는 일이 다릅니다.</span><span class="en">Every dollar you pay for care is water poured into a bucket. There are two kinds, and what happens when each is full is different.</span></p>
+    <div class="buckets">
+      <div class="bk">
+        <div class="pail" aria-hidden="true"><div class="water w1"></div><span class="line"><span class="ko">다 차면</span><span class="en">Full</span></span></div>
+        <div class="bk-text">
+          <h3><span class="ko">버킷 1 · 디덕티블</span><span class="en">Bucket 1 · Deductible</span></h3>
+          <p><b class="ok-t"><span class="ko">다 차면 내 몫이 줄어듭니다.</span><span class="en">When full, your share drops.</span></b> <span class="ko">0이 되지는 않습니다.</span><span class="en">It does not go to zero.</span></p>
+          <ul class="clean small">
+            <li><span class="ko">Part B: $283(2026)이 차면 그 뒤 20%씩</span><span class="en">Part B: after $283 (2026), you pay 20%</span></li>
+            <li><span class="ko">Part D 약: $700(2027)이 차면 그 뒤 약 25%씩</span><span class="en">Part D drugs: after $700 (2027), about 25%</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="bk">
+        <div class="pail" aria-hidden="true"><div class="water w2"></div><span class="line"><span class="ko">다 차면</span><span class="en">Full</span></span></div>
+        <div class="bk-text">
+          <h3><span class="ko">버킷 2 · 연간 본인부담 상한</span><span class="en">Bucket 2 · Out-of-pocket maximum</span></h3>
+          <p><b class="ok-t"><span class="ko">다 차면 그 해 나머지는 $0입니다.</span><span class="en">When full, you pay $0 for the rest of the year.</span></b></p>
+          <ul class="clean small">
+            <li><span class="ko">Part D 약값: $2,400 (2027)</span><span class="en">Part D drugs: $2,400 (2027)</span></li>
+            <li><span class="ko">어드밴티지: 최대 $9,850 (2027, 네트워크 안)</span><span class="en">Advantage: up to $9,850 (2027, in-network)</span></li>
+            <li><span class="ko">오리지널 메디케어 A·B만 있으면 이 버킷이 <b>없습니다</b>. 20%가 끝없이 나갈 수 있어서 서플먼트를 듭니다.</span><span class="en">Original Medicare A and B alone has <b>no</b> such bucket. The 20% can go on without limit, which is why people buy a supplement.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="note"><b><span class="ko">하이디덕티블 Plan G는 버킷이 하나</span><span class="en">High-Deductible Plan G has one bucket</span></b><br><span class="ko">$3,050(2027, 2026년은 $2,950)이 차면 그 뒤로는 Plan G가 다 내줍니다. 이 플랜에서는 디덕티블 버킷이 곧 "이 이상은 안 내도 되는" 버킷입니다. 1월 1일에 다시 비워집니다.</span><span class="en">Once $3,050 is filled (2027; $2,950 in 2026), Plan G pays the rest. On this plan the deductible bucket is the "no more after this" bucket. It empties again on January 1.</span></div>
+  </div>
+
+  <div class="block">
+    <h2><span class="ko">디덕티블은 어떻게 내나요?</span><span class="en">How do you actually pay a deductible?</span></h2>
+    <p><span class="ko">디덕티블은 <b>한꺼번에 미리 내는 돈이 아닙니다.</b> 따로 청구서가 오지도 않습니다. 병원에 갈 때마다 진료비를 내다 보면 1년 동안 쌓여서 채워지는 "문턱"입니다. 문턱을 넘으면 그때부터 내 몫이 확 줄어듭니다.</span><span class="en">A deductible is <b>not paid up front in one lump</b>, and no separate bill comes for it. It is a threshold you fill up over the year as you pay for visits. Once you pass it, your share drops.</span></p>
+    <div class="tablewrap"><table>
+      <thead><tr><th><span class="ko">Part B 예시 (2026 디덕티블 $283)</span><span class="en">Part B example (2026 deductible $283)</span></th><th><span class="ko">진료비</span><span class="en">Bill</span></th><th><span class="ko">내가 내는 돈</span><span class="en">You pay</span></th><th><span class="ko">문턱까지 남은 돈</span><span class="en">Left to meet</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="ko">1월 · 첫 진료</span><span class="en">January · first visit</span></td><td class="num">$150</td><td class="num">$150</td><td class="num">$133</td></tr>
+        <tr><td><span class="ko">3월 · 두 번째 진료 ($133은 전액, 나머지 $67은 20%)</span><span class="en">March · second visit ($133 in full, then 20% of the other $67)</span></td><td class="num">$200</td><td class="num">$146.40</td><td class="num">$0</td></tr>
+        <tr><td><span class="ko">5월 · 세 번째 진료 (이제 20%만)</span><span class="en">May · third visit (now just 20%)</span></td><td class="num">$100</td><td class="num">$20</td><td class="num">$0</td></tr>
+        <tr><td><span class="ko">다음 해 1월 1일</span><span class="en">Next January 1</span></td><td colspan="3"><span class="ko">문턱이 다시 $0부터 시작합니다.</span><span class="en">The threshold starts over at $0.</span></td></tr>
+      </tbody>
+    </table></div>
+    <small class="src"><span class="ko">진료비는 메디케어가 인정하는 금액 기준입니다. 숫자는 이해를 돕기 위한 예시입니다.</span><span class="en">Bills are Medicare-approved amounts. Numbers are an illustration.</span></small>
+    <dl style="margin:0">
+      <div class="term"><dt><span class="ko">Part A (입원)</span><span class="eng">Hospital</span></dt><dd><span class="ko">입원할 때만 해당됩니다. 1년 단위가 아니라 "입원 기간"마다 $1,736(2026). 퇴원 후 60일이 지나 다시 입원하면 새로 시작합니다.</span><span class="en">Only when you are admitted. It applies per benefit period, not per year: $1,736 in 2026. If you go 60 days out of the hospital and are admitted again, a new one starts.</span></dd></div>
+      <div class="term"><dt><span class="ko">Part D (약)</span><span class="eng">Drugs</span></dt><dd><span class="ko">약국에서 약값 전액을 내다가 문턱(2027년 최대 $700)을 넘으면 약값의 25% 정도만 냅니다. 1년에 $2,400을 내면 그 해 나머지 약값은 $0입니다. 대부분의 제네릭 약과 인슐린은 문턱과 상관없이 처음부터 싸게 받습니다. 디덕티블이 $0인 플랜도 많습니다.</span><span class="en">At the pharmacy you pay full price until you pass the deductible (up to $700 in 2027), then about 25%. Once you have paid $2,400 in a year, covered drugs cost $0 for the rest of it. Most generics and insulin skip the deductible. Many plans have a $0 deductible.</span></dd></div>
+      <div class="term"><dt><span class="ko">어드밴티지 플랜</span><span class="eng">Medicare Advantage</span></dt><dd><span class="ko">디덕티블 대신 "진료 한 번 $20, 전문의 $45"처럼 정해진 금액(코페이)인 경우가 많습니다. 플랜 안내서(Summary of Benefits)에서 확인하세요.</span><span class="en">Often flat copays instead, like $20 per visit or $45 for a specialist. Check the plan's Summary of Benefits.</span></dd></div>
+      <div class="term"><dt><span class="ko">서플먼트 Plan G</span><span class="eng">Medigap Plan G</span></dt><dd><span class="ko">Part B 디덕티블($283)만 내가 채우고, 그 뒤 20%는 서플먼트가 냅니다. 그래서 1년 의료비 본인부담이 거의 그 금액에서 끝납니다.</span><span class="en">You cover only the Part B deductible ($283); the supplement pays the 20% after that, so your yearly medical cost mostly stops there.</span></dd></div>
+    </dl>
+  </div>
+
+  <div class="block">
+    <h2><span class="ko">2026년과 2027년 주요 금액</span><span class="en">Key amounts, 2026 and 2027</span></h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th><span class="ko">항목</span><span class="en">Item</span></th><th>2026</th><th>2027</th></tr></thead>
+      <tbody>
+        <tr><td><span class="ko">Part B 월 보험료(표준)</span><span class="en">Part B monthly premium (standard)</span></td><td class="num">$202.90 <span class="pill off"><span class="ko">확정</span><span class="en">Official</span></span></td><td class="num">≈$209.50 <span class="pill proj"><span class="ko">예상</span><span class="en">Projected</span></span></td></tr>
+        <tr><td><span class="ko">Part B 연간 디덕티블</span><span class="en">Part B yearly deductible</span></td><td class="num">$283 <span class="pill off"><span class="ko">확정</span><span class="en">Official</span></span></td><td class="num">≈$292 <span class="pill proj"><span class="ko">예상</span><span class="en">Projected</span></span></td></tr>
+        <tr><td><span class="ko">Part A 입원 디덕티블(입원 기간마다)</span><span class="en">Part A hospital deductible (per benefit period)</span></td><td class="num">$1,736 <span class="pill off"><span class="ko">확정</span><span class="en">Official</span></span></td><td class="num"><span class="ko">11월 발표</span><span class="en">Announced in Nov.</span></td></tr>
+        <tr><td><span class="ko">Part D 최대 디덕티블</span><span class="en">Part D maximum deductible</span></td><td class="num">$615 <span class="pill off"><span class="ko">확정</span><span class="en">Official</span></span></td><td class="num">$700 <span class="pill off"><span class="ko">확정</span><span class="en">Official</span></span></td></tr>
+        <tr><td><span class="ko">Part D 연간 약값 본인부담 상한</span><span class="en">Part D yearly drug cost cap</span></td><td class="num">$2,100 <span class="pill off"><span class="ko">확정</span><span class="en">Official</span></span></td><td class="num">$2,400 <span class="pill off"><span class="ko">확정</span><span class="en">Official</span></span></td></tr>
+        <tr><td><span class="ko">어드밴티지 본인부담 상한(네트워크 안)</span><span class="en">Advantage out-of-pocket limit (in-network)</span></td><td class="num">$9,250 <span class="pill off"><span class="ko">확정</span><span class="en">Official</span></span></td><td class="num">$9,850 <span class="pill off"><span class="ko">확정</span><span class="en">Official</span></span></td></tr>
+      </tbody>
+    </table></div>
+    <small class="src"><span class="ko">"예상"은 2026년 메디케어 이사회 보고서 전망치입니다. CMS가 보통 11월에 확정 발표하므로, 발표 후 이 표를 갱신합니다. 상한 금액은 최대치이며 플랜마다 더 낮을 수 있습니다.</span><span class="en">"Projected" figures come from the 2026 Medicare Trustees Report. CMS usually confirms them in November; this table will be updated then. Limits are maximums; many plans set lower ones.</span></small>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section id="compare" role="tabpanel" hidden>
+  <p class="lead"><span class="ko">65세가 되면 크게 두 길 중 하나를 고릅니다. 둘 다 동시에 가질 수는 없습니다.</span><span class="en">At 65 you choose one of two main paths. You cannot have both at once.</span></p>
+  <div class="vs">
+    <div class="side">
+      <h3><span class="ko">길 1 · 오리지널 메디케어 + 서플먼트(메디갭) + Part D</span><span class="en">Path 1 · Original Medicare + Supplement (Medigap) + Part D</span></h3>
+      <ul class="clean">
+        <li><span class="ko">메디케어를 받는 미국 내 어느 의사·병원이든 갈 수 있습니다. 네트워크 제한이 없습니다.</span><span class="en">Any doctor or hospital in the U.S. that takes Medicare. No network.</span></li>
+        <li><span class="ko">보통 사전승인(prior authorization)이 적습니다.</span><span class="en">Usually fewer prior-authorization hurdles.</span></li>
+        <li><span class="ko">서플먼트가 A·B의 20% 본인부담 등 "구멍"을 메워줍니다. 예: Plan G는 Part B 디덕티블만 빼고 대부분을 냅니다. Plan F는 2020년 이전에 메디케어 자격이 있던 분만 가입할 수 있습니다.</span><span class="en">The supplement fills A and B's gaps, like the 20% coinsurance. Plan G covers nearly all of it except the Part B deductible. Plan F is only for people eligible before 2020.</span></li>
+        <li><span class="ko">서플먼트는 약을 보장하지 않습니다. Part D를 따로 들어야 합니다.</span><span class="en">Supplements don't cover drugs. You need a separate Part D plan.</span></li>
+        <li><span class="ko">월 보험료가 높은 편이지만, 큰 병이 난 해에도 비용이 예측 가능합니다.</span><span class="en">Higher monthly premiums, but costs stay predictable even in a bad health year.</span></li>
+      </ul>
+      <p class="fit"><span class="ko">맞는 분: 약이나 진료가 많은 분, 여러 전문의를 보는 분, 텍사스 밖(예: 자녀 집)에 자주 머무는 분.</span><span class="en">Good fit: heavy medical use, many specialists, frequent time outside Texas.</span></p>
+    </div>
+    <div class="side">
+      <h3><span class="ko">길 2 · 메디케어 어드밴티지(Part C)</span><span class="en">Path 2 · Medicare Advantage (Part C)</span></h3>
+      <ul class="clean">
+        <li><span class="ko">민간 보험사 플랜 하나로 A·B·대부분 D까지. 치과·안경·보청기 혜택이 붙기도 합니다.</span><span class="en">One private plan for A, B and usually D. Some add dental, vision or hearing extras.</span></li>
+        <li><span class="ko">보험료가 낮거나 $0인 경우가 많습니다. 그래도 Part B 보험료는 계속 냅니다.</span><span class="en">Premiums are often low or $0. You still pay the Part B premium.</span></li>
+        <li><span class="ko">네트워크가 있습니다. HMO는 대개 네트워크 밖 진료를 보장하지 않습니다.</span><span class="en">Networks apply. HMOs usually don't cover out-of-network care.</span></li>
+        <li><span class="ko">사전승인이 필요한 경우가 많습니다.</span><span class="en">Prior authorization is common.</span></li>
+        <li><span class="ko">연간 본인부담 상한이 있습니다. 2027년 최대 $9,850(네트워크 안).</span><span class="en">Yearly out-of-pocket cap: up to $9,850 in-network in 2027.</span></li>
+      </ul>
+      <p class="fit"><span class="ko">맞는 분: 비교적 건강하고, 다니는 의사가 플랜 네트워크 안에 있으며, 월 보험료를 낮추고 싶은 분.</span><span class="en">Good fit: fairly healthy, your doctors are in the network, you want low monthly costs.</span></p>
+    </div>
+  </div>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th><span class="ko">비교</span><span class="en">Compare</span></th><th><span class="ko">오리지널 + 서플먼트</span><span class="en">Original + Supplement</span></th><th><span class="ko">어드밴티지</span><span class="en">Advantage</span></th></tr></thead>
+    <tbody>
+      <tr><td><span class="ko">의사 선택</span><span class="en">Doctors</span></td><td><span class="ko">메디케어 받는 곳 어디든</span><span class="en">Anyone who takes Medicare</span></td><td><span class="ko">네트워크 안</span><span class="en">In the network</span></td></tr>
+      <tr><td><span class="ko">월 보험료</span><span class="en">Monthly premium</span></td><td><span class="ko">높은 편</span><span class="en">Higher</span></td><td><span class="ko">낮거나 $0</span><span class="en">Low or $0</span></td></tr>
+      <tr><td><span class="ko">아플 때 최악의 비용</span><span class="en">Worst-case year</span></td><td><span class="ko">낮고 예측 가능</span><span class="en">Low and predictable</span></td><td><span class="ko">상한까지(최대 $9,850)</span><span class="en">Up to the cap ($9,850 max)</span></td></tr>
+      <tr><td><span class="ko">약 보장</span><span class="en">Drugs</span></td><td><span class="ko">Part D 따로 가입</span><span class="en">Separate Part D</span></td><td><span class="ko">대부분 포함</span><span class="en">Usually included</span></td></tr>
+      <tr><td><span class="ko">사전승인</span><span class="en">Prior authorization</span></td><td><span class="ko">적음</span><span class="en">Less</span></td><td><span class="ko">많음</span><span class="en">More</span></td></tr>
+      <tr><td><span class="ko">나중에 바꾸기</span><span class="en">Switching later</span></td><td colspan="2"><span class="ko">아래 경고 참고</span><span class="en">See the warning below</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="alertbox"><b><span class="ko">가장 중요한 경고: 서플먼트 가입 시기</span><span class="en">Most important warning: when to buy a supplement</span></b><br>
+  <span class="ko">65세 이상이면서 Part B가 시작된 달부터 <b>6개월</b>이 서플먼트 "개방 가입 기간"입니다. 이 기간에는 건강 상태 때문에 거절당하거나 더 비싸게 낼 수 없습니다. 이 기간이 지나면 보험사가 건강 질문을 하고 거절하거나 보험료를 올릴 수 있습니다. 그래서 "일단 어드밴티지로 갔다가 나중에 서플먼트로 바꾸자"가 생각처럼 쉽지 않을 수 있습니다. 바꾸기 전에 꼭 텍사스 무료 상담(HICAP)에 확인하세요.</span>
+  <span class="en">Your Medigap Open Enrollment Period is the <b>6 months</b> starting the month you are 65 or older and enrolled in Part B. During it, companies can't refuse you or charge more for health problems. After it, they can generally ask health questions and refuse or charge more. So "start with Advantage and switch to a supplement later" may not work. Check with Texas HICAP (free) before you switch.</span></div>
+</section>
+
+<!-- HELP -->
+<section id="help" role="tabpanel" hidden>
+  <p class="lead"><span class="ko">약값이 한 달에 수백~천 불씩 나가는 분은 이 페이지를 먼저 보세요. 소득이 적으면 정부가 상당 부분을 내줍니다.</span><span class="en">If your drugs cost hundreds of dollars a month, start here. With limited income, government programs can pay much of it.</span></p>
+
+  <div class="block">
+    <h2><span class="ko">세 가지 지원 프로그램</span><span class="en">Three programs</span></h2>
+    <dl style="margin:0">
+      <div class="term"><dt><span class="ko">엑스트라 헬프</span><span class="eng">Extra Help (Part D Low-Income Subsidy)</span></dt><dd><span class="ko">Part D 보험료·디덕티블·약값을 줄여줍니다. 2027년에는 대상자가 약값을 제네릭 최대 $5.80, 브랜드 약 최대 $14.40만 냅니다. 소셜시큐리티(ssa.gov)에서 신청하며 무료입니다.</span><span class="en">Lowers Part D premiums, deductibles and drug costs. In 2027, people with Extra Help pay at most $5.80 per generic and $14.40 per brand-name drug. Apply free through Social Security (ssa.gov).</span></dd></div>
+      <div class="term"><dt><span class="ko">메디케어 저축 프로그램</span><span class="eng">Medicare Savings Programs (MSP)</span></dt><dd><span class="ko">주정부 프로그램으로 Part B 보험료(경우에 따라 디덕티블·본인부담까지)를 내줍니다. MSP 자격이 되면 엑스트라 헬프도 자동으로 받습니다. 텍사스는 HHSC(YourTexasBenefits.com)에서 신청합니다.</span><span class="en">State programs that pay the Part B premium, and for some people deductibles and coinsurance too. If you qualify, you also get Extra Help automatically. In Texas, apply through HHSC (YourTexasBenefits.com).</span></dd></div>
+      <div class="term"><dt><span class="ko">메디케이드 (메디케어와 동시 수혜 = "듀얼")</span><span class="eng">Medicaid ("dual eligible")</span></dt><dd><span class="ko">소득·재산이 더 낮으면 메디케어와 메디케이드를 둘 다 받을 수 있고, 본인부담이 거의 없어집니다.</span><span class="en">With lower income and assets, you can have both Medicare and Medicaid, and most out-of-pocket costs go away.</span></dd></div>
+    </dl>
+    <div class="note"><b><span class="ko">오바마케어(ACA)는요?</span><span class="en">What about Obamacare (ACA)?</span></b><br><span class="ko">메디케어가 있는 분은 일반적으로 ACA 마켓플레이스 플랜을 쓸 수 없습니다. 메디케어 가입자가 비용을 줄이는 길은 위의 세 가지입니다. 정책 이름이 바뀌어도(정권이 바뀌어도) 이 구조는 따로 법이 바뀌기 전까지 그대로입니다.</span><span class="en">People with Medicare generally can't use ACA Marketplace plans. For Medicare enrollees, the three programs above are the way to lower costs. A new political label doesn't change this unless the law changes.</span></div>
+  </div>
+
+  <form class="tool" id="ehForm">
+    <h2><span class="ko">엑스트라 헬프 자가 점검</span><span class="en">Extra Help self-check</span></h2>
+    <p class="fit"><span class="ko">2026년 기준(연소득: 1인 $23,940 · 부부 $32,460 / 재산: 1인 $18,090 · 부부 $36,100). 집, 차 1대, 장례비 일부는 재산에 포함되지 않습니다.</span><span class="en">2026 limits (yearly income: $23,940 single, $32,460 married; resources: $18,090 single, $36,100 married). Your home, one car and some burial funds don't count.</span></p>
+    <label for="eh-hh"><span class="ko">가구</span><span class="en">Household</span>
+      <select id="eh-hh"><option value="1">혼자 / Single</option><option value="2">부부 / Married</option></select></label>
+    <label for="eh-inc"><span class="ko">월 소득 합계 ($) — 소셜연금, 연금, 근로소득 등</span><span class="en">Total monthly income ($) — Social Security, pension, wages</span>
+      <input id="eh-inc" type="number" inputmode="decimal" min="0" value="1800"></label>
+    <label for="eh-res"><span class="ko">예금·투자 합계 ($) — 집·차 제외</span><span class="en">Savings and investments ($) — not your home or car</span>
+      <input id="eh-res" type="number" inputmode="decimal" min="0" value="9000"></label>
+    <button class="btn" type="submit"><span class="ko">확인하기</span><span class="en">Check</span></button>
+    <div id="ehOut" class="result yes" aria-live="polite"></div>
+    <small class="src"><span class="ko">예시 값이 들어 있습니다. 본인 숫자로 바꿔 보세요. 이 점검은 참고용이며, 최종 판단은 소셜시큐리티가 합니다. 기준에 조금 넘어도 일부 소득은 빼고 계산하므로 신청해 보는 것이 좋습니다.</span><span class="en">Example values are filled in; replace them with yours. This is only a guide; Social Security decides. If you are slightly over, apply anyway, since some income isn't counted.</span></small>
+  </form>
+</section>
+
+<!-- TRANSLATE -->
+<section id="translate" role="tabpanel" hidden>
+  <p class="lead"><span class="ko">메디케어나 보험사에서 온 영어 편지를 붙여넣거나 사진으로 올리세요. 쉬운 한국어로 번역하고, 무슨 서류인지, 무엇을 언제까지 해야 하는지, 사기 의심 표시가 있는지 알려드립니다.</span><span class="en">Paste or photograph an English letter from Medicare or an insurer. You'll get a plain-language translation, what the letter is, what to do and by when, and any scam warning signs.</span></p>
+  <form class="tool" id="trForm">
+    <label for="tr-text"><span class="ko">서류 내용 (붙여넣기)</span><span class="en">Letter text (paste)</span>
+      <textarea id="tr-text" placeholder="Paste the letter here..."></textarea></label>
+    <label for="tr-img" id="tr-img-wrap"><span class="ko">또는 사진 올리기</span><span class="en">Or add a photo</span>
+      <input id="tr-img" type="file" accept="image/*" multiple></label>
+    <div class="alertbox" style="font-size:.95rem"><span class="ko">메디케어 번호, 소셜 번호, 은행 정보는 지우거나 가리고 올리세요.</span><span class="en">Cover or delete your Medicare number, Social Security number and bank details first.</span></div>
+    <div class="row">
+      <button class="btn" type="submit" id="tr-go"><span class="ko">번역하고 설명 듣기</span><span class="en">Translate and explain</span></button>
+      <button class="btn ghost" type="button" id="tr-stop" hidden><span class="ko">멈추기</span><span class="en">Stop</span></button>
+    </div>
+    <div id="trOut" class="out" aria-live="polite"><span class="ko">결과가 여기에 나옵니다.</span><span class="en">Your result appears here.</span></div>
+  </form>
+
+  <form class="tool" id="qaForm">
+    <h2><span class="ko">궁금한 것 물어보기</span><span class="en">Ask a question</span></h2>
+    <label for="qa-q"><span class="ko">질문</span><span class="en">Question</span>
+      <textarea id="qa-q" style="min-height:90px">약을 한 달에 800불어치 먹는데 어드밴티지가 나아요, 서플먼트가 나아요?</textarea></label>
+    <div class="row">
+      <button class="btn" type="submit" id="qa-go"><span class="ko">물어보기</span><span class="en">Ask</span></button>
+      <button class="btn ghost" type="button" id="qa-stop" hidden><span class="ko">멈추기</span><span class="en">Stop</span></button>
+    </div>
+    <div id="qaOut" class="out" aria-live="polite"><span class="ko">예시 질문이 들어 있습니다. 바꿔서 물어보세요.</span><span class="en">An example question is filled in. Change it to yours.</span></div>
+    <small class="src"><span class="ko">답변은 이 앱에 정리된 공식 자료를 근거로 합니다. 개인 결정 전에는 HICAP(무료)에 확인하세요.</span><span class="en">Answers are based on the official facts in this app. Confirm with HICAP (free) before deciding.</span></small>
+  </form>
+  <p id="aiOff" class="note" hidden><span class="ko">이 화면에서는 AI 번역 기능을 쓸 수 없습니다. Claude 앱이나 claude.ai에서 열어 주세요.</span><span class="en">AI translation isn't available in this view. Open the page in the Claude app or claude.ai.</span></p>
+</section>
+
+<!-- SCAM -->
+<section id="scam" role="tabpanel" hidden>
+  <p class="lead"><span class="ko">받은 전화·문자·방문에 해당하는 것을 체크하세요. 하나라도 있으면 끊고, 직접 확인하세요.</span><span class="en">Tick anything that happened in the call, text or visit. If any apply, hang up and check for yourself.</span></p>
+  <div class="check" id="scamList">
+    <label><input type="checkbox"><span><span class="ko">메디케어라며 먼저 전화해서 메디케어 번호나 소셜 번호를 물었다</span><span class="en">Someone "from Medicare" called first and asked for my Medicare or Social Security number</span></span></label>
+    <label><input type="checkbox"><span><span class="ko">"새 카드 발급", "혜택이 끊긴다", "오늘까지 안 하면 손해"라고 서둘렀다</span><span class="en">They rushed me: "new card", "you'll lose benefits", "today only"</span></span></label>
+    <label><input type="checkbox"><span><span class="ko">공짜 검사키트, 무릎보호대, 유전자 검사를 준다며 번호를 달라고 했다</span><span class="en">They offered free test kits, braces or genetic tests in exchange for my number</span></span></label>
+    <label><input type="checkbox"><span><span class="ko">선물이나 현금을 주겠다며 플랜 변경을 권했다</span><span class="en">They offered gifts or cash to switch plans</span></span></label>
+    <label><input type="checkbox"><span><span class="ko">부탁하지 않았는데 보험 판매원이 전화하거나 집에 찾아왔다</span><span class="en">An agent called or came to my door without my asking</span></span></label>
+    <label><input type="checkbox"><span><span class="ko">"정부 공식"이라며 플랜이 하나뿐인 것처럼 말했다</span><span class="en">They said they were "official government" and only one plan was right</span></span></label>
+  </div>
+  <p class="scamresult" id="scamOut" aria-live="polite"></p>
+  <div class="note"><b><span class="ko">기억할 것</span><span class="en">Remember</span></b>
+    <ul class="clean">
+      <li><span class="ko">메디케어는 내가 먼저 연락하지 않았는데 전화해서 번호를 묻지 않습니다.</span><span class="en">Medicare won't call out of the blue to ask for your number.</span></li>
+      <li><span class="ko">보험 판매원은 요청받지 않은 전화·방문으로 영업할 수 없습니다(메디케어 마케팅 규정).</span><span class="en">Agents may not market by unsolicited calls or visits (Medicare marketing rules).</span></li>
+      <li><span class="ko">에이전트는 계약된 보험사 상품만 보여줄 수 있습니다. 중립적인 비교는 Medicare.gov 플랜 비교기나 HICAP에서 받으세요.</span><span class="en">Agents may only show plans from companies they contract with. For neutral comparisons, use the Medicare.gov Plan Finder or HICAP.</span></li>
+      <li><span class="ko">의심되면 신고: 1-800-MEDICARE 또는 시니어 메디케어 패트롤(SMP) 1-877-808-2468.</span><span class="en">Report it: 1-800-MEDICARE or Senior Medicare Patrol (SMP) 1-877-808-2468.</span></li>
+    </ul></div>
+</section>
+
+<!-- DATES -->
+<section id="dates" role="tabpanel" hidden>
+  <div class="block">
+    <h2><span class="ko">가입·변경 시기</span><span class="en">When you can join or change</span></h2>
+    <div class="dates">
+      <div class="date"><div class="when"><span class="ko">65세 생일 달 앞뒤 7개월</span><span class="en">7 months around your 65th birthday month</span></div><div><span class="ko">첫 가입 기간. 생일 달 3개월 전부터 3개월 후까지. 늦으면 평생 벌금(Part B·D)이 붙을 수 있습니다.</span><span class="en">Initial Enrollment: 3 months before your birthday month through 3 months after. Joining late can bring lifelong Part B or D penalties.</span></div></div>
+      <div class="date"><div class="when">10/15 – 12/7</div><div><span class="ko">연례 가입 기간(올해: 2026년 10월 15일 ~ 12월 7일). 어드밴티지·Part D 변경, 오리지널로 복귀. 1월 1일부터 적용.</span><span class="en">Open Enrollment (this year: Oct 15 – Dec 7, 2026). Change Advantage or Part D plans, or go back to Original Medicare. Changes start Jan 1.</span></div></div>
+      <div class="date"><div class="when">1/1 – 3/31</div><div><span class="ko">어드밴티지 가입자 변경 기간. 다른 어드밴티지로 한 번 바꾸거나 오리지널(+Part D)로 돌아갈 수 있습니다.</span><span class="en">Advantage Open Enrollment: people in an Advantage plan can switch once to another Advantage plan or to Original Medicare (+ Part D).</span></div></div>
+      <div class="date"><div class="when"><span class="ko">9월 말 우편</span><span class="en">Late September mail</span></div><div><span class="ko">"연간 변경 안내(ANOC)" 편지. 내 플랜이 내년에 무엇이 바뀌는지 적혀 있습니다. 번역 탭에 올려 보세요.</span><span class="en">"Annual Notice of Change" letter: what changes in your plan next year. Upload it in the Translate tab.</span></div></div>
+    </div>
+  </div>
+  <div class="block">
+    <h2><span class="ko">가입은 전화로 할 수 있습니다</span><span class="en">You can enroll by phone</span></h2>
+    <div class="dates">
+      <div class="date"><div class="when">Part A · B</div><div><span class="ko">소셜시큐리티 1-800-772-1213 또는 ssa.gov. 소셜연금을 이미 받고 있으면 65세에 자동 가입되는 경우가 많습니다.</span><span class="en">Social Security, 1-800-772-1213 or ssa.gov. If you already get Social Security, you are often enrolled automatically at 65.</span></div></div>
+      <div class="date"><div class="when"><span class="ko">어드밴티지 · Part D</span><span class="en">Advantage · Part D</span></div><div><span class="ko">1-800-MEDICARE(1-800-633-4227). 상담원이 플랜 비교와 등록까지 도와줍니다. 또는 Medicare.gov 플랜 비교기에서 직접 등록.</span><span class="en">1-800-MEDICARE (1-800-633-4227). The representative can compare plans and enroll you. Or enroll yourself in the Medicare.gov Plan Finder.</span></div></div>
+      <div class="date"><div class="when"><span class="ko">서플먼트</span><span class="en">Supplement</span></div><div><span class="ko">원하는 보험사에 직접 전화합니다. 같은 Plan(예: G)이면 보장 내용은 회사가 달라도 똑같고, 보험료만 다릅니다.</span><span class="en">Call the insurance company directly. A given letter plan (like G) has the same benefits at every company; only the price differs.</span></div></div>
+      <div class="date"><div class="when"><span class="ko">고르기 전에</span><span class="en">Before choosing</span></div><div><span class="ko">텍사스 HICAP 1-800-252-9240에서 무료로 중립 상담을 받으세요. 아무 상품도 팔지 않습니다.</span><span class="en">Get free, neutral advice from Texas HICAP, 1-800-252-9240. They sell nothing.</span></div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2><span class="ko">무료 공식 연락처</span><span class="en">Free official phone numbers</span></h2>
+    <p class="fit"><span class="ko">한국어 통역이 필요하면 연결된 뒤 "Korean"이라고 말하세요.</span><span class="en">If you need a Korean interpreter, say "Korean" when connected.</span></p>
+    <div class="contacts">
+      <div class="contact"><div><b><span class="ko">메디케어</span><span class="en">Medicare</span></b><br><span class="tel">1-800-633-4227</span></div><button class="copy" type="button" data-copy="1-800-633-4227"><span class="ko">복사</span><span class="en">Copy</span></button></div>
+      <div class="contact"><div><b><span class="ko">텍사스 HICAP (무료 1:1 상담)</span><span class="en">Texas HICAP (free counseling)</span></b><br><span class="tel">1-800-252-9240</span></div><button class="copy" type="button" data-copy="1-800-252-9240"><span class="ko">복사</span><span class="en">Copy</span></button></div>
+      <div class="contact"><div><b><span class="ko">소셜시큐리티 (가입·엑스트라 헬프)</span><span class="en">Social Security (enroll, Extra Help)</span></b><br><span class="tel">1-800-772-1213</span></div><button class="copy" type="button" data-copy="1-800-772-1213"><span class="ko">복사</span><span class="en">Copy</span></button></div>
+      <div class="contact"><div><b><span class="ko">시니어 메디케어 패트롤 (사기 신고)</span><span class="en">Senior Medicare Patrol (fraud)</span></b><br><span class="tel">1-877-808-2468</span></div><button class="copy" type="button" data-copy="1-877-808-2468"><span class="ko">복사</span><span class="en">Copy</span></button></div>
+    </div>
+    <p><span class="ko">플랜 비교: </span><span class="en">Compare plans: </span><a href="https://www.medicare.gov/plan-compare" target="_blank" rel="noopener">medicare.gov/plan-compare</a> · <span class="ko">엑스트라 헬프 신청: </span><span class="en">Extra Help: </span><a href="https://www.ssa.gov/medicare/part-d-extra-help" target="_blank" rel="noopener">ssa.gov</a></p>
+  </div>
+</section>
+
+<footer>
+  <p><span class="ko">이 앱은 교육용 안내이며 보험 판매나 개인 법률·재정 자문이 아닙니다. 어떤 보험사와도 관계가 없습니다. 출처: Medicare.gov, CMS(2027 요율 발표·MOOP 기준), 2026 메디케어 이사회 보고서, 텍사스 HHSC. 마지막 확인: 2026년 10월 11일.</span><span class="en">Educational guide only; not insurance sales or personal legal or financial advice. Not affiliated with any insurer. Sources: Medicare.gov, CMS (CY2027 Rate Announcement, MOOP standards), 2026 Medicare Trustees Report, Texas HHSC. Last checked Oct 11, 2026.</span></p>
+  <p>HAKOYA LLC</p>
+</footer>
+</div>
+
+<script>
+(function(){
+  var lang='ko';
+  try{var s=localStorage.getItem('mg-lang'); if(s==='en'||s==='ko') lang=s;}catch(e){}
+  function setLang(l){lang=l;document.body.classList.toggle('en',l==='en');document.documentElement.lang=l;
+    document.getElementById('btn-ko').setAttribute('aria-pressed',l==='ko');document.getElementById('btn-en').setAttribute('aria-pressed',l==='en');
+    try{localStorage.setItem('mg-lang',l)}catch(e){} renderEH(); renderScam();}
+  document.getElementById('btn-ko').onclick=function(){setLang('ko')};
+  document.getElementById('btn-en').onclick=function(){setLang('en')};
+
+  var tabs=[].slice.call(document.querySelectorAll('.tab'));
+  function show(id){tabs.forEach(function(t){var on=t.dataset.tab===id;t.setAttribute('aria-selected',on);document.getElementById(t.dataset.tab).hidden=!on;});}
+  tabs.forEach(function(t){t.onclick=function(){show(t.dataset.tab);window.scrollTo({top:0})}});
+  var h=(location.hash||'').slice(1); if(document.getElementById(h)&&tabs.some(function(t){return t.dataset.tab===h})) show(h);
+
+  /* Extra Help check — 2026 limits (Medicare.gov) */
+  var LIM={1:{inc:23940,res:18090},2:{inc:32460,res:36100}};
+  function renderEH(){
+    var hh=document.getElementById('eh-hh').value, inc=+document.getElementById('eh-inc').value||0, res=+document.getElementById('eh-res').value||0;
+    var L=LIM[hh], yi=inc*12, okI=yi<=L.inc, okR=res<=L.res, out=document.getElementById('ehOut');
+    var fmt=function(n){return '$'+Math.round(n).toLocaleString('en-US')};
+    out.className='result '+(okI&&okR?'yes':'maybe');
+    if(lang==='ko'){
+      out.innerHTML='<b>'+(okI&&okR?'자격이 될 가능성이 높습니다. 신청해 보세요.':'기준을 넘을 수 있지만, 그래도 신청해 볼 만합니다.')+'</b>'+
+        '<span>연소득 '+fmt(yi)+' / 기준 '+fmt(L.inc)+' · 재산 '+fmt(res)+' / 기준 '+fmt(L.res)+'</span>'+
+        '<span>신청: ssa.gov 또는 1-800-772-1213. 텍사스 MSP도 함께 확인하세요(1-800-252-9240).</span>';
+    } else {
+      out.innerHTML='<b>'+(okI&&okR?'You likely qualify. Apply.':'You may be over the limit, but applying is still worth it.')+'</b>'+
+        '<span>Yearly income '+fmt(yi)+' / limit '+fmt(L.inc)+' · Resources '+fmt(res)+' / limit '+fmt(L.res)+'</span>'+
+        '<span>Apply at ssa.gov or 1-800-772-1213. Also ask about Texas MSP (1-800-252-9240).</span>';
+    }
+  }
+  document.getElementById('ehForm').addEventListener('submit',function(e){e.preventDefault();renderEH()});
+  ['eh-hh','eh-inc','eh-res'].forEach(function(id){document.getElementById(id).addEventListener('input',renderEH)});
+
+  /* Scam checklist */
+  function renderScam(){
+    var n=document.querySelectorAll('#scamList input:checked').length, o=document.getElementById('scamOut');
+    if(!n){o.textContent=lang==='ko'?'해당 사항이 없으면 그래도 번호를 주기 전에 직접 1-800-MEDICARE로 확인하세요.':'Nothing ticked. Still, call 1-800-MEDICARE yourself before giving out your number.';o.style.color='';return;}
+    o.style.color='var(--alert)';
+    o.textContent=lang==='ko'?('사기 의심 신호 '+n+'개. 대화를 끊고, 아무 번호도 주지 마세요. SMP 1-877-808-2468에 신고하세요.'):(n+' warning sign'+(n>1?'s':'')+'. Stop talking and give no numbers. Report to SMP at 1-877-808-2468.');
+  }
+  document.getElementById('scamList').addEventListener('change',renderScam);
+
+  /* Copy buttons */
+  document.querySelectorAll('.copy').forEach(function(b){b.onclick=function(){
+    var v=b.dataset.copy, done=function(){var k=b.innerHTML;b.textContent=lang==='ko'?'복사됨':'Copied';setTimeout(function(){b.innerHTML=k},1500)};
+    try{navigator.clipboard.writeText(v).then(done,function(){selectTel(b)})}catch(e){selectTel(b)}
+  }});
+  function selectTel(b){var t=b.parentNode.querySelector('.tel');var r=document.createRange();r.selectNodeContents(t);var s=getSelection();s.removeAllRanges();s.addRange(r);}
+
+  setLang(lang);
+
+  /* AI: grounded translation and Q&A */
+  var FACTS=[
+   'FACTS (verified Oct 11, 2026; use only these numbers; say "check with HICAP" if unsure):',
+   'Part B premium 2026 $202.90/mo (official); 2027 projected ~$209.50 (Trustees Report; CMS confirms in November).',
+   'Part B deductible 2026 $283 (official); 2027 projected ~$292. Part A deductible 2026 $1,736 per benefit period.',
+   'Part D 2027: max deductible $700, out-of-pocket cap $2,400 (official; 2026: $615 and $2,100). Most generics and insulins excluded from deductible.',
+   'Medicare Advantage in-network out-of-pocket max: 2026 $9,250, 2027 $9,850 (combined in+out of network $13,900 / $14,800). Original Medicare has no cap.',
+   'Medigap: Open Enrollment = 6 months starting the month you are 65+ and in Part B; no medical underwriting then. After that insurers can generally underwrite. Medigap does not cover drugs (needs Part D). Plan G covers all but Part B deductible; Plan F only for those eligible before 2020. Cannot use Medigap with Advantage.',
+   'Extra Help 2026 limits: income $23,940 single / $32,460 married per year; resources $18,090 / $36,100. 2027 Extra Help: $0 premium on qualifying plans, $0 deductible, max $5.80 generic / $14.40 brand. Apply via ssa.gov. MSP qualifiers get Extra Help automatically. Texas MSP/Medicaid via HHSC 1-800-252-9240.',
+   'People with Medicare generally cannot use ACA Marketplace plans.',
+   'Two-bucket explanation: the deductible bucket, when full, lowers your share but not to zero; the out-of-pocket maximum bucket, when full, means $0 for the rest of the year. Original Medicare A/B has no out-of-pocket maximum. High-Deductible Plan G: deductible $2,950 (2026) / $3,050 (2027, CMS); after it, Plan G pays the rest. Plan N: like G but up to $20 office copay, up to $50 ER copay (waived if admitted), no coverage of Part B excess charges.',
+   'Deductibles are not prepaid or billed separately: you pay full Medicare-approved cost of services until your payments reach the deductible, then 20% coinsurance (Part B). Resets Jan 1. Part A deductible is per benefit period (resets after 60 days out of hospital). Advantage plans often use flat copays instead.',
+   'Enrolling: Part A/B via Social Security (1-800-772-1213, ssa.gov); Advantage/Part D via 1-800-MEDICARE or the Medicare.gov Plan Finder; Medigap by calling the insurer directly (same letter plan = same benefits at every company).',
+   'Dates: Open Enrollment Oct 15 - Dec 7 (effective Jan 1). Advantage Open Enrollment Jan 1 - Mar 31. Initial Enrollment: 7 months around 65th birthday month.',
+   'Phones: Medicare 1-800-633-4227; Texas HICAP 1-800-252-9240; SSA 1-800-772-1213; Senior Medicare Patrol 1-877-808-2468.',
+   'Scams: Medicare does not call unprompted asking for numbers; agents may not make unsolicited calls or door visits; offers of gifts or free medical items for your number are red flags.'
+  ].join('\n');
+
+  var sampleFn=null;
+  function hideAI(){document.getElementById('trForm').hidden=true;document.getElementById('qaForm').hidden=true;document.getElementById('aiOff').hidden=false;}
+  if(window.claude&&claude.use){
+    claude.use('sample').then(function(s){
+      if(!s){hideAI();return;}
+      sampleFn=s;
+      s.limits().then(function(c){if(!c||!c.images) document.getElementById('tr-img-wrap').hidden=true;},function(){document.getElementById('tr-img-wrap').hidden=true;});
+    });
+  } else hideAI();
+
+  function errText(e){
+    var c=e&&e.code, ko=lang==='ko';
+    if(c==='not_granted'||c==='sampling_disabled'){hideAI();return ko?'AI 사용이 허용되지 않았습니다.':'AI use was not allowed.';}
+    if(c==='rate_limited') return ko?'요청이 많습니다. 잠시 후 다시 눌러 주세요.':'Too many requests. Try again in a little while.';
+    if(c==='image_rejected') return ko?'사진을 읽을 수 없습니다. 다른 사진을 올려 주세요.':'That photo could not be read. Try another one.';
+    if(c==='prompt_too_large') return ko?'글이 너무 깁니다. 한 페이지씩 나눠서 올려 주세요.':'Too long. Send one page at a time.';
+    if(c==='refused') return ko?'이 내용은 처리할 수 없습니다. 내용을 바꿔 주세요.':'This could not be processed. Try different text.';
+    return ko?'연결이 끊겼습니다. 다시 눌러 주세요.':'Connection problem. Please try again.';
+  }
+
+  function run(btn,stop,out,input,opts){
+    var ctl=new AbortController(); opts.signal=ctl.signal;
+    opts.onText=function(u){out.textContent=u.text};
+    btn.disabled=true; stop.hidden=false; out.textContent=lang==='ko'?'생각하는 중…':'Thinking…';
+    stop.onclick=function(){ctl.abort()};
+    sampleFn(input,opts).then(function(r){if(r.truncated) out.textContent+=(lang==='ko'?'\n\n(길어서 잘렸습니다. 나눠서 올려 주세요.)':'\n\n(Cut short. Send less at a time.)');},
+      function(e){ if(e&&e.code==='cancelled'){out.textContent=e.text||'';return;} out.textContent=(e&&e.text?e.text+'\n\n':'')+errText(e);})
+     .then(function(){btn.disabled=false;stop.hidden=true;});
+  }
+
+  document.getElementById('trForm').addEventListener('submit',function(e){
+    e.preventDefault(); if(!sampleFn) return;
+    var txt=document.getElementById('tr-text').value.trim(), files=document.getElementById('tr-img').files, out=document.getElementById('trOut');
+    if(!txt&&!(files&&files.length)){out.textContent=lang==='ko'?'서류 내용을 붙여넣거나 사진을 올려 주세요.':'Paste the letter or add a photo first.';return;}
+    var target=lang==='ko'?'Korean (polite 존댓말, simple words a Korean senior understands)':'plain simple English';
+    var prompt='You help Korean-American seniors in Texas understand Medicare paperwork. Answer in '+target+'. Do not sell or recommend any specific company. If an ID number (Medicare, SSN, bank) appears, do not repeat it.\n\n'+FACTS+
+      '\n\nThe user sent a document'+(files&&files.length?' (see the attached photo(s))':'')+'. Reply with these short sections:\n1. What this is (who sent it, what kind of letter)\n2. Translation of the important parts\n3. What I need to do, and the deadline (or "No action needed")\n4. Scam warning signs (or "None seen")\n5. Who to call if unsure (use the phones in FACTS)\nPlain text, no tables.'+
+      (txt?'\n\nDOCUMENT TEXT:\n'+txt.slice(0,20000):'');
+    var opts={}; if(files&&files.length) opts.images=[].slice.call(files,0,4);
+    run(document.getElementById('tr-go'),document.getElementById('tr-stop'),out,prompt,opts);
+  });
+
+  document.getElementById('qaForm').addEventListener('submit',function(e){
+    e.preventDefault(); if(!sampleFn) return;
+    var q=document.getElementById('qa-q').value.trim(), out=document.getElementById('qaOut');
+    if(!q){out.textContent=lang==='ko'?'질문을 적어 주세요.':'Type a question first.';return;}
+    var target=lang==='ko'?'Korean (polite 존댓말, simple words)':'plain simple English';
+    var prompt='You are a neutral Medicare guide for Korean-American seniors in Texas. Answer in '+target+', in under 250 words. Use only the FACTS below for numbers and rules; if the answer depends on details not given (their drugs, doctors, income), say what to check and point to the Medicare.gov Plan Finder or Texas HICAP 1-800-252-9240. Never recommend a specific insurance company. Not legal or financial advice.\n\n'+FACTS+'\n\nQUESTION:\n'+q.slice(0,4000);
+    run(document.getElementById('qa-go'),document.getElementById('qa-stop'),out,prompt,{cache:false});
+  });
+})();
+</script>
+
+</body>
+</html>
