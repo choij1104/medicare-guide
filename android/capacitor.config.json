@@ -1,0 +1,9 @@
+{
+  "appId": "com.hakoya.medicareguide",
+  "appName": "메디케어 길라잡이",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#F5F6F2",
+    "allowMixedContent": false
+  }
+}

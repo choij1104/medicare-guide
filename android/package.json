@@ -1,0 +1,18 @@
+{
+  "name": "medicare-guide-android",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Google Play build of Medicare Guide (메디케어 길라잡이), wrapped with Capacitor. Offline store bundle built from the repository's index.html by scripts/build-store.py.",
+  "scripts": {
+    "build:www": "python3 scripts/build-store.py"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3",
+    "@fontsource/gowun-batang": "5.2.8",
+    "@fontsource/noto-sans-kr": "5.3.0"
+  }
+}
