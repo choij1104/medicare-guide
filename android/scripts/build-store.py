@@ -19,7 +19,9 @@ The web app in the repository root is not modified. The store build differs in t
      the key-amounts table. No number is changed.
   5. Outbound links (medicare.gov, cms.gov, ssa.gov) stay ordinary links; inside the app
      Capacitor opens them in the system browser.
-  6. Capacitor runtime: @capacitor/core's capacitor.js is bundled and loaded first.
+  6. Layout: grid children get min-width:0 so the calculator's wide table scrolls inside its
+     box instead of widening the "Find my fit" tab on phones (the same bug exists in main).
+  7. Capacitor runtime: @capacitor/core's capacitor.js is bundled and loaded first.
 
 Every text replacement must match exactly once, or the build fails.
 Run `npm ci` in android/ first so the @fontsource packages are present.
@@ -75,7 +77,9 @@ if len(gf) != 1:
 t = t.replace(gf[0], '<link rel="stylesheet" href="fonts/fonts.css">')
 
 # 3. Independence notice and official sources ------------------------------------------
-NOTICE_CSS = ".indep{border:1.5px solid var(--line);border-radius:12px;padding:12px 16px;font-size:.95rem;color:var(--muted);background:var(--card)}\n.indep b{color:var(--ink)}\n"
+# Layout fix: grid items default to min-width:auto, so the 520px calculator table widened the
+# whole "Find my fit" tab to ~580px on a 360px phone instead of scrolling inside .tablewrap.
+NOTICE_CSS = "section>*,form.tool>*{min-width:0}\n.indep{border:1.5px solid var(--line);border-radius:12px;padding:12px 16px;font-size:.95rem;color:var(--muted);background:var(--card)}\n.indep b{color:var(--ink)}\n"
 t = sub1("@media (prefers-reduced-motion:no-preference){.water{", NOTICE_CSS + "@media (prefers-reduced-motion:no-preference){.water{", t, "notice CSS")
 
 SRC_LINKS = ('<a href="https://www.medicare.gov" target="_blank" rel="noopener">medicare.gov</a> · '
