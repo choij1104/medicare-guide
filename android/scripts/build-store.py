@@ -134,14 +134,28 @@ open(os.path.join(OUT, "index.html"), "w", encoding="utf-8").write(t)
 # Fonts: @fontsource's own per-weight CSS keeps each subset's unicode-range; woff2 only.
 # Gowun Batang is used only for headings (bold); Noto Sans KR at 400, 500 and 700.
 want = {"gowun-batang": [700], "noto-sans-kr": [400, 500, 700]}
+USED = {ord(c) for c in t}
 css = []
 for pkg, weights in want.items():
     for w in weights:
         src = open(os.path.join(FS, pkg, f"{w}.css"), encoding="utf-8").read()
         src = re.sub(r",\s*url\([^)]*\.woff\) format\('woff'\)", "", src)
-        for f in re.findall(r"url\(\./files/([^)]+\.woff2)\)", src):
-            shutil.copy(os.path.join(FS, pkg, "files", f), os.path.join(OUT, "fonts", f))
-        css.append(src.replace("url(./files/", "url("))
+        # Keep only the subsets whose unicode-range covers a character the app actually uses
+        # (keeps the bundle small enough for Play Console's web upload; nothing visible changes).
+        kept = []
+        for blk in src.split("@font-face")[1:]:
+            rng = re.search(r"unicode-range:\s*([^;]+);", blk)
+            if rng:
+                spans = []
+                for part in rng.group(1).split(","):
+                    lo, _, hi = part.strip()[2:].partition("-")
+                    spans.append((int(lo, 16), int(hi or lo, 16)))
+                if not any(lo <= c <= hi for c in USED for lo, hi in spans):
+                    continue
+            for f in re.findall(r"url\(\./files/([^)]+\.woff2)\)", blk):
+                shutil.copy(os.path.join(FS, pkg, "files", f), os.path.join(OUT, "fonts", f))
+            kept.append("@font-face" + blk)
+        css.append("".join(kept).replace("url(./files/", "url("))
 open(os.path.join(OUT, "fonts", "fonts.css"), "w", encoding="utf-8").write("\n".join(css))
 shutil.copy(os.path.join(FS, "gowun-batang", "LICENSE"), os.path.join(OUT, "fonts", "OFL-GowunBatang.txt"))
 shutil.copy(os.path.join(FS, "noto-sans-kr", "LICENSE"), os.path.join(OUT, "fonts", "OFL-NotoSansKR.txt"))
