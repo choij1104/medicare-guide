@@ -290,7 +290,7 @@ ul.small{font-size:.95rem}
 
 <!-- CHOOSER -->
 <section id="chooser" role="tabpanel" hidden>
-  <p class="lead"><span class="ko">두 단계입니다. ① 질문 8개에 답하면 어느 쪽이 맞을지 방향을 알려드리고, ② 받은 견적을 넣으면 1년에 실제로 얼마가 나가는지 계산해 드립니다.</span><span class="en">Two steps. (1) Answer 8 questions to see which direction fits you. (2) Enter the quotes you got to see what each option really costs per year.</span></p>
+  <p class="lead"><span class="ko">세 단계입니다. ① 질문 8개에 답하면 어느 쪽이 맞을지 방향을 알려드리고, ② 받은 견적을 넣으면 1년에 실제로 얼마가 나가는지 비교하고, ③ 소득·근로 기간·벌금·사는 주까지 넣어 본인이 실제로 내는 금액을 계산합니다.</span><span class="en">Three steps. (1) Answer 8 questions to see which direction fits you. (2) Enter the quotes you got to compare yearly costs. (3) Add your income, work history, penalties and state to see what you personally pay.</span></p>
 
   <form class="tool" id="qzForm">
     <h2><span class="ko">① 설문: 나에게 맞는 방향</span><span class="en">Step 1 · Questions: which direction fits</span></h2>
@@ -316,6 +316,39 @@ ul.small{font-size:.95rem}
     <div id="calcOut" aria-live="polite"></div>
     <small class="src"><span class="ko">계산 가정: 진료 1회당 메디케어 인정 금액 약 $150. "많이 아픈 해"는 입원 1회(Part A 디덕티블 $1,736, 2026 금액 사용) + 외래·검사 $30,000으로 가정. Plan N은 진료 1회 최대 $20 코페이로 계산했고, 초과청구(excess charge)는 포함하지 않았습니다. 어드밴티지 "많이 아픈 해"는 연간 상한까지 낸다고 가정. 약값 본인부담(최대 $2,400)은 어느 쪽이든 비슷하게 상한이 있어 제외했습니다. 실제 금액은 플랜마다 다릅니다.</span><span class="en">Assumptions: about $150 Medicare-approved per visit. "Bad year" = one hospital stay (Part A deductible $1,736, 2026 figure) plus $30,000 of outpatient care and tests. Plan N uses up to $20 per visit and excludes excess charges. Advantage "bad year" assumes you reach the plan's cap. Drug out-of-pocket costs (capped at $2,400) are left out since every path has that cap. Real costs vary by plan.</span></small>
   </form>
+  <form class="tool" id="myForm">
+    <h2><span class="ko">③ 내 실제 금액 (본인 해당 · 주별 추정)</span><span class="en">Step 3 · My own cost (personal, by state)</span></h2>
+    <p class="fit"><span class="ko">CMS·Medicare.gov 공식 규칙으로 <b>본인이 실제로 내는 월·연 금액</b>을 계산합니다. 소득별 할증(IRMAA), Part A 보험료, 늦은 가입 벌금, 지원 프로그램을 반영하고, 서플먼트는 본인 견적(없으면 주 평균 참고치)을 씁니다.</span><span class="en">Uses official CMS and Medicare.gov rules to compute <b>what you personally pay</b> each month and year: income surcharge (IRMAA), Part A premium, late penalties and help programs. The supplement uses your quote, or your state's average if you have none yet.</span></p>
+    <div class="grid2">
+      <label for="m-yr"><span class="ko">기준 연도</span><span class="en">Year</span>
+        <select id="m-yr"><option value="2026">2026 (확정 / Official)</option><option value="2027" selected>2027 (예상 / Projected)</option></select></label>
+      <label for="m-st"><span class="ko">사는 주</span><span class="en">State you live in</span><select id="m-st"></select></label>
+      <label for="m-fs"><span class="ko">세금 보고 형태</span><span class="en">Tax filing status</span>
+        <select id="m-fs"><option value="s">혼자 / Single</option><option value="j">부부 공동 / Married filing jointly</option><option value="m">부부 별도 / Married filing separately</option></select></label>
+      <label for="m-inc"><span class="ko" id="m-inc-ko">수정 조정 총소득(MAGI, $) — 2년 전 세금보고</span><span class="en" id="m-inc-en">Modified adjusted gross income (MAGI, $) — tax return 2 years earlier</span><input id="m-inc" type="number" min="0" inputmode="decimal" value="50000"></label>
+      <label for="m-wq"><span class="ko">본인 또는 배우자 근로 기간(메디케어 세금 낸 분기)</span><span class="en">Work credits (you or spouse, Medicare-taxed quarters)</span>
+        <select id="m-wq"><option value="40">40분기(10년) 이상 / 40+</option><option value="30">30–39분기 / 30–39</option><option value="0">30분기 미만 / Under 30</option></select></label>
+      <label for="m-alate"><span class="ko">Part A를 돈 내고 사는데 늦게 가입했나요?</span><span class="en">Buying Part A and enrolled late?</span>
+        <select id="m-alate"><option value="0">아니요 / No</option><option value="1">예 / Yes</option></select></label>
+      <label for="m-blate"><span class="ko">Part B 늦게 가입한 기간 (개월, 특별가입기간 제외)</span><span class="en">Months Part B was delayed (outside a Special Enrollment Period)</span><input id="m-blate" type="number" min="0" inputmode="numeric" value="0"></label>
+      <label for="m-dlate"><span class="ko">약 보험(크레디터블) 없이 지낸 기간 (개월)</span><span class="en">Months without creditable drug coverage</span><input id="m-dlate" type="number" min="0" inputmode="numeric" value="0"></label>
+      <label for="m-msp"><span class="ko">메디케어 저축 프로그램(MSP)</span><span class="en">Medicare Savings Program (MSP)</span>
+        <select id="m-msp"><option value="none">없음 / None</option><option value="qmb">QMB</option><option value="slmb">SLMB · QI</option></select></label>
+      <label for="m-eh"><span class="ko">엑스트라 헬프(Part D 지원)</span><span class="en">Extra Help (Part D)</span>
+        <select id="m-eh"><option value="0">없음 / No</option><option value="1">받음 / Yes</option></select></label>
+      <label for="m-plan"><span class="ko">서플먼트 플랜</span><span class="en">Supplement plan</span>
+        <select id="m-plan"><option value="G">Plan G</option><option value="N">Plan N</option><option value="H">하이디덕 G / High-Deductible G</option></select></label>
+      <label for="m-mg"><span class="ko">서플먼트 월 보험료 견적 ($) — 비우면 주 평균</span><span class="en">Supplement monthly quote ($) — blank = state average</span><input id="m-mg" type="number" min="0" inputmode="decimal" placeholder=""></label>
+      <label for="m-pd"><span class="ko">Part D 플랜 월 보험료 ($)</span><span class="en">Part D plan monthly premium ($)</span><input id="m-pd" type="number" min="0" inputmode="decimal" value="40"></label>
+      <label for="m-ma"><span class="ko">어드밴티지 플랜 월 보험료 ($)</span><span class="en">Advantage plan monthly premium ($)</span><input id="m-ma" type="number" min="0" inputmode="decimal" value="0"></label>
+    </div>
+    <p class="fit"><a href="https://www.medicare.gov/medigap-supplemental-insurance-plans/" target="_blank" rel="noopener"><span class="ko">▶ Medicare.gov에서 내 ZIP 서플먼트 견적 보기</span><span class="en">▶ Get supplement prices for your ZIP on Medicare.gov</span></a><br>
+    <a href="https://www.medicare.gov/plan-compare/" target="_blank" rel="noopener"><span class="ko">▶ Medicare.gov에서 Part D·어드밴티지 보험료 보기</span><span class="en">▶ Compare Part D and Advantage premiums on Medicare.gov</span></a></p>
+    <button class="btn" type="submit"><span class="ko">내 금액 계산</span><span class="en">Calculate my cost</span></button>
+    <div id="myOut" aria-live="polite"></div>
+    <small class="src"><span class="ko">출처: CMS 2026 Part A·B 보험료·디덕티블 안내(IRMAA 표 포함), Medicare.gov 늦은 가입 벌금 안내, CMS 2027 Part D 기준 보험료($41.33)·하이디덕 G $3,050·어드밴티지 상한 $9,850, 2026 메디케어 이사회 보고서(2027 예상치), 주별 서플먼트 평균: KFF의 NAIC 자료 분석(2025, 현재 가입자 전 연령 평균). 2027 Part A·B 금액과 IRMAA 구간은 CMS 발표 전이라 2026 구간을 적용한 예상치입니다. 실제 보험료 고지서는 사회보장국(SSA)이 보냅니다.</span><span class="en">Sources: CMS 2026 Part A and B premiums and deductibles fact sheet (with IRMAA tables); Medicare.gov late-penalty rules; CMS 2027 Part D base premium ($41.33), High-Deductible G $3,050 and Advantage cap $9,850; 2026 Medicare Trustees Report (2027 projections); state supplement averages: KFF analysis of NAIC data (2025, current policyholders of all ages). 2027 Part A/B amounts and IRMAA brackets are not yet announced by CMS, so 2026 brackets are used as a projection. Your actual premium notice comes from Social Security.</span></small>
+  </form>
+
 </section>
 
 <!-- HELP -->
@@ -574,8 +607,105 @@ ul.small{font-size:.95rem}
   document.getElementById('calcForm').addEventListener('submit',function(e){e.preventDefault();renderCalc();});
   ['c-g','c-n','c-h','c-d','c-ma','c-mac','c-moop','c-v'].forEach(function(id){document.getElementById(id).addEventListener('input',renderCalc)});
 
+  /* Step 3: my own cost (personal, by state). Sources in the section footnote. */
+  // KFF analysis of NAIC data via Mark Farrah Associates, 2025: average monthly premium among current policyholders (all ages) — [all plans, Plan G, Plan N]
+  var MG_ST={AK:[222,176,170],AL:[218,191,143],AR:[230,183,151],AZ:[249,197,173],CA:[261,196,204],CO:[237,198,166],CT:[255,242,191],DC:[232,165,165],DE:[227,168,182],FL:[262,222,202],GA:[227,178,160],HI:[214,169,142],IA:[250,181,160],ID:[234,211,169],IL:[260,205,171],IN:[236,186,183],KS:[239,187,149],KY:[235,180,174],LA:[228,182,163],MA:[237,197,141],MD:[260,208,190],ME:[250,230,189],MI:[235,180,184],MN:[283,206,191],MO:[241,204,176],MS:[231,179,151],MT:[227,186,165],NC:[223,193,155],ND:[272,195,141],NE:[254,203,159],NH:[222,180,194],NJ:[258,210,191],NM:[217,164,160],NV:[253,199,191],NY:[306,257,269],OH:[229,183,190],OK:[223,175,168],OR:[238,214,174],PA:[236,190,158],RI:[239,181,176],SC:[220,165,152],SD:[242,188,150],TN:[220,171,149],TX:[238,191,165],UT:[240,192,170],VA:[220,165,154],VT:[223,179,182],WA:[243,220,186],WI:[256,152,185],WV:[249,189,178],WY:[236,187,165]};
+  var MG_RATE={AR:'c',CT:'c',ID:'c',MA:'c',ME:'c',MN:'c',NY:'c',VT:'c',WA:'c',FL:'i',AZ:'ic',GA:'ic',MO:'ic'};
+  var MG_WAIVER={MA:1,MN:1,WI:1};
+  // off: CMS-confirmed. 2027 Part A/B and IRMAA brackets are projections until CMS publishes them.
+  var MY={
+    2026:{off:true,b:202.90,bded:283,a30:311,a0:565,aded:1736,dbase:38.99,hdg:2950,dcap:2100,moop:9250,magi:2024,dirm:[0,14.50,37.50,60.40,83.30,91.00]},
+    2027:{off:false,b:209.50,bded:292,a30:311,a0:565,aded:1788,dbase:41.33,hdg:3050,dcap:2400,moop:9850,magi:2025,dirm:null}
+  };
+  var B_MULT=[1,1.4,2.0,2.6,3.2,3.4];
+  var BR={s:[109000,137000,171000,205000,500000],j:[218000,274000,342000,410000,750000]};
+  function r10(x){return Math.round(x*10)/10}
+  function tier(fs,inc){
+    if(fs==='m') return inc<=109000?0:(inc<391000?4:5);
+    var b=BR[fs]; if(inc<=b[0])return 0; if(inc<=b[1])return 1; if(inc<=b[2])return 2; if(inc<=b[3])return 3; return inc<b[4]?4:5;
+  }
+  (function(){var sel=document.getElementById('m-st');Object.keys(MG_ST).sort().forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=k;if(k==='TX')o.selected=true;sel.appendChild(o);});})();
+  function val(id){return document.getElementById(id).value}
+  var myShown=false;
+  function renderMy(){
+    var ko=lang==='ko', Y=MY[val('m-yr')], yr=val('m-yr'), st=val('m-st'), fs=val('m-fs'), inc=num('m-inc'), wq=+val('m-wq'), alate=val('m-alate')==='1',
+        blm=Math.floor(num('m-blate')), dlm=Math.floor(num('m-dlate')), msp=val('m-msp'), eh=val('m-eh')==='1', plan=val('m-plan'),
+        mgRaw=document.getElementById('m-mg').value, pd=num('m-pd'), ma=num('m-ma');
+    var f=function(x){return '$'+(Math.round(x*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})};
+    var fy=function(x){return '$'+Math.round(x).toLocaleString('en-US')};
+    var notes=[], flags=[];
+    // Part A
+    var aBase = wq>=40?0:(wq>=30?Y.a30:Y.a0), aPrem = aBase>0&&alate ? r10(aBase*1.1) : aBase;
+    if(msp==='qmb') aPrem=0;
+    // Part B
+    var t=tier(fs,inc), bIrmaa=r10(Y.b*B_MULT[t]), bPen=Math.floor(blm/12)*0.10*Y.b, bPrem=r10(bIrmaa+bPen);
+    if(msp!=='none'){bPrem=0;}
+    // Part D (applies to stand-alone Part D and to Advantage plans with drug coverage)
+    var dirm = Y.dirm ? Y.dirm[t] : r10(MY[2026].dirm[t]*Y.dbase/MY[2026].dbase);
+    var dPen = eh?0:r10(Y.dbase*dlm/100);
+    if(eh) dirm=0;
+    // Supplement
+    var avg=MG_ST[st], mgUsed, mgSrc;
+    if(mgRaw!=='' && isFinite(parseFloat(mgRaw))){mgUsed=Math.max(0,parseFloat(mgRaw));mgSrc='q';}
+    else if(plan==='G'&&avg[1]){mgUsed=avg[1];mgSrc='a';}
+    else if(plan==='N'&&avg[2]){mgUsed=avg[2];mgSrc='a';}
+    else {mgUsed=0;mgSrc='x';}
+    var mgLine = mgSrc==='q' ? (ko?'내 견적':'Your quote') : mgSrc==='a' ? (ko?st+' 주 평균 참고치 (실제 견적 아님)':st+' state average (not a quote)') : (ko?'견적 필요 — 주 평균 자료 없음':'Quote needed — no state average');
+    var supM=aPrem+bPrem+mgUsed+pd+dirm+dPen, maM=aPrem+bPrem+ma+dirm+dPen;
+    var planName = plan==='G'?'Plan G':plan==='N'?'Plan N':(ko?'하이디덕 G':'High-Deductible G');
+    var supMax = plan==='G'?Y.bded:(plan==='H'?Y.hdg:Y.bded);
+    var rowsA=[
+      [ko?'Part A 보험료':'Part A premium', aPrem, aPrem],
+      [ko?'Part B 보험료 (할증·벌금 포함)':'Part B premium (incl. surcharge, penalty)', bPrem, bPrem],
+      [planName+' — '+mgLine, mgUsed, null],
+      [ko?'Part D 플랜 보험료':'Part D plan premium', pd, null],
+      [ko?'어드밴티지 플랜 보험료':'Advantage plan premium', null, ma],
+      [ko?'Part D 소득 할증':'Part D income surcharge', dirm, dirm],
+      [ko?'Part D 늦은 가입 벌금':'Part D late penalty', dPen, dPen]
+    ];
+    var c=function(x){return x===null?'—':f(x)};
+    var h='<div class="lean"><h3>'+(ko?(yr+'년 내 월 보험료'):('My monthly premiums, '+yr))+(Y.off?'':' <span class="pill proj">'+(ko?'예상':'Projected')+'</span>')+'</h3>';
+    h+='<div class="tablewrap"><table><thead><tr><th>'+(ko?'항목':'Item')+'</th><th>'+(ko?'오리지널 + 서플먼트':'Original + Supplement')+'</th><th>'+(ko?'어드밴티지':'Advantage')+'</th></tr></thead><tbody>';
+    rowsA.forEach(function(r){h+='<tr><td>'+r[0]+'</td><td class="num">'+c(r[1])+'</td><td class="num">'+c(r[2])+'</td></tr>'});
+    var best=supM<=maM?'s':'m';
+    h+='<tr><td><b>'+(ko?'월 합계':'Monthly total')+'</b></td><td class="num"><b>'+f(supM)+'</b></td><td class="num"><b>'+f(maM)+'</b></td></tr>';
+    h+='<tr><td><b>'+(ko?'1년 보험료 합계':'Yearly premiums')+'</b></td><td class="num'+(best==='s'?' best':'')+'"><b>'+fy(supM*12)+'</b></td><td class="num'+(best==='m'?' best':'')+'"><b>'+fy(maM*12)+'</b></td></tr>';
+    var supNote = plan==='N' ? (ko?' + 진료 1회 최대 $20·응급실 최대 $50 코페이':' + up to $20 per visit, $50 ER copays') : '';
+    var supMedMax = msp==='qmb'?0:supMax;
+    h+='<tr><td>'+(ko?'아픈 해 의료비 본인부담 최대 (약값 제외)':'Most you pay for medical care in a bad year (excl. drugs)')+'</td><td class="num">'+fy(supMedMax)+supNote+'</td><td class="num">'+(msp==='qmb'?'$0':(ko?'최대 ':'up to ')+fy(Y.moop))+'</td></tr>';
+    h+='<tr><td>'+(ko?'약값 본인부담 상한 (Part D)':'Drug out-of-pocket cap (Part D)')+'</td><td class="num">'+fy(Y.dcap)+'</td><td class="num">'+fy(Y.dcap)+'</td></tr>';
+    h+='<tr><td><b>'+(ko?'최악의 해 총액 (보험료 + 의료비 + 약값 상한)':'Worst-case year (premiums + medical + drug cap)')+'</b></td><td class="num"><b>'+fy(supM*12+supMedMax+Y.dcap)+'</b></td><td class="num"><b>'+fy(maM*12+(msp==='qmb'?0:Y.moop)+Y.dcap)+'</b></td></tr>';
+    h+='</tbody></table></div>';
+    // explanations
+    var tierTxt=['','1','2','3','4','5'];
+    if(msp!=='none') notes.push(ko?'MSP가 Part B 보험료를 대신 내므로 $0으로 계산했습니다.':'MSP pays your Part B premium, so it is $0 here.');
+    else if(t>0) notes.push(ko?('소득이 할증 '+tierTxt[t]+'구간입니다. Part B 보험료가 표준 '+f(Y.b)+' 대신 '+f(bIrmaa)+'입니다. '+Y.magi+'년 세금보고 소득 기준이며, 은퇴·배우자 사망 등 소득이 줄었다면 SSA-44 양식으로 재심을 요청할 수 있습니다.'):('Your income is in surcharge tier '+tierTxt[t]+'. Your Part B premium is '+f(bIrmaa)+' instead of the standard '+f(Y.b)+'. It is based on your '+Y.magi+' tax return; if your income dropped (retirement, death of a spouse), you can ask SSA to redo it with form SSA-44.'));
+    else notes.push(ko?('소득 할증 없음. Part B 표준 보험료 '+f(Y.b)+'입니다 ('+Y.magi+'년 세금보고 소득 기준).'):('No income surcharge. Standard Part B premium '+f(Y.b)+' (based on your '+Y.magi+' tax return).'));
+    if(bPen>0&&msp==='none') notes.push(ko?('Part B 늦은 가입 벌금: '+Math.floor(blm/12)+'년 × 10% = 월 '+f(bPen)+'. 평생 붙습니다.'):('Part B late penalty: '+Math.floor(blm/12)+' full year(s) × 10% = '+f(bPen)+'/month, for as long as you have Part B.'));
+    if(blm>0&&blm<12&&msp==='none') notes.push(ko?'12개월을 채우지 않은 기간에는 Part B 벌금이 붙지 않습니다.':'No Part B penalty for less than a full 12 months.');
+    if(dPen>0) notes.push(ko?('Part D 늦은 가입 벌금: 기준 보험료 '+f(Y.dbase)+' × '+dlm+'% = 월 '+f(dPen)+'. Part D가 있는 동안 계속 붙습니다. 63일 미만 공백은 벌금이 없습니다.'):('Part D late penalty: base premium '+f(Y.dbase)+' × '+dlm+'% = '+f(dPen)+'/month, for as long as you have Part D. Gaps under 63 days carry no penalty.'));
+    if(eh) notes.push(ko?'엑스트라 헬프가 있으면 Part D 늦은 가입 벌금이 없고, 기준 금액 이하 플랜을 고르면 Part D 보험료가 $0일 수 있습니다. Part D 보험료 칸에 실제 금액을 넣으세요.':'With Extra Help there is no Part D late penalty, and a plan at or below the benchmark can cost $0. Enter your actual Part D premium.');
+    if(aBase>0&&msp==='qmb') notes.push(ko?('근로 기간이 40분기 미만이지만 QMB가 Part A 보험료('+f(aBase)+')를 내줍니다.'):('You have under 40 work quarters, but QMB pays your Part A premium ('+f(aBase)+').'));
+    else if(aBase>0) notes.push(ko?('근로 기간이 40분기 미만이라 Part A를 사야 합니다: 월 '+f(aPrem)+(alate?' (늦은 가입 10% 포함, 늦은 기간의 2배 동안).':'.')+' 배우자의 근로 기록으로 무료가 될 수 있으니 SSA(1-800-772-1213)에 확인하세요.'):('With under 40 work quarters you buy Part A: '+f(aPrem)+'/month'+(alate?' (incl. 10% late penalty, lasting twice the years you were late).':'.')+' You may qualify free through a spouse\'s work record; check with SSA (1-800-772-1213).'));
+    if(msp==='qmb') notes.push(ko?'QMB는 Part A·B 보험료와 디덕티블·본인부담까지 내줍니다. 그래서 서플먼트가 보통 필요 없습니다. 병원은 QMB 가입자에게 본인부담을 청구할 수 없습니다.':'QMB pays Part A and B premiums, deductibles and coinsurance, so a supplement is usually not needed. Providers may not bill QMB members for Medicare cost-sharing.');
+    if(mgSrc==='a') notes.push(ko?(st+' 주 서플먼트 평균은 현재 가입자 전 연령 평균입니다(KFF 2025). 65세 신규 가입자는 보통 이보다 싸고, 나이·성별·흡연·ZIP에 따라 크게 다릅니다. Medicare.gov에서 본인 견적을 받아 칸에 넣으세요.'):('The '+st+' supplement average covers current policyholders of all ages (KFF, 2025). New 65-year-olds often pay less, and prices vary a lot by age, sex, tobacco use and ZIP. Get your own quote on Medicare.gov and enter it.'));
+    if(mgSrc==='x') flags.push(ko?(planName+'는 '+st+' 주 평균 자료가 없어 서플먼트 보험료를 $0으로 두었습니다. 견적을 입력하세요.'):('No '+st+' state average for '+planName+', so the supplement premium is $0 here. Enter a quote.'));
+    if(MG_WAIVER[st]) flags.push(ko?(st+' 주는 서플먼트가 연방 표준(A–N)과 다른 자체 플랜 체계를 씁니다. 플랜 이름이 다를 수 있습니다.'):(st+' uses its own supplement plan system, not the federal A–N letters. Plan names may differ.'));
+    var rt=MG_RATE[st];
+    notes.push(ko?(rt==='c'?st+' 주는 서플먼트 보험료를 나이와 관계없이 같게 매기는 방식(커뮤니티 레이팅)입니다.':rt==='i'?st+' 주는 가입 당시 나이로 보험료를 정하는 방식(이슈 에이지)입니다.':rt==='ic'?st+' 주는 가입 나이 기준 또는 커뮤니티 레이팅만 허용합니다.':st+' 주는 나이가 들수록 보험료가 오르는 방식(어테인드 에이지)도 허용됩니다. 견적을 받을 때 어떤 방식인지 꼭 물어보세요.'):(rt==='c'?st+' requires community rating: the same premium regardless of age.':rt==='i'?st+' requires issue-age rating: based on your age when you buy.':rt==='ic'?st+' allows issue-age or community rating only.':st+' allows attained-age rating, where premiums rise as you age. Ask which method a quote uses.'));
+    if(!Y.off) flags.push(ko?'2027 Part A·B 금액과 소득 할증 구간은 CMS 발표 전이라 예상치입니다. 발표되면 이 계산기를 갱신합니다.':'2027 Part A/B amounts and surcharge brackets are projections until CMS announces them. This calculator will be updated then.');
+    h+='<ul class="clean">'+notes.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul>';
+    if(flags.length) h+='<div class="alertbox">'+flags.map(function(x){return '<p>'+x+'</p>'}).join('')+'</div>';
+    h+='<small class="src">'+(ko?'어드밴티지 쪽은 약 보장이 포함된 플랜(MA-PD) 기준이며, 소득 할증·늦은 가입 벌금은 어드밴티지 약 보장에도 똑같이 붙습니다. 보험료가 가장 낮은 쪽이 꼭 맞는 선택은 아닙니다. 결정 전 텍사스 HICAP(1-800-252-9240) 무료 상담을 받으세요.':'The Advantage column assumes a plan with drug coverage (MA-PD); income surcharges and late penalties apply there too. The lowest premium is not always the right choice. Talk to Texas HICAP (1-800-252-9240, free) before deciding.')+'</small></div>';
+    document.getElementById('myOut').innerHTML=h; myShown=true;
+  }
+  document.getElementById('myForm').addEventListener('submit',function(e){e.preventDefault();renderMy();});
+  ['m-yr','m-st','m-fs','m-inc','m-wq','m-alate','m-blate','m-dlate','m-msp','m-eh','m-plan','m-mg','m-pd','m-ma'].forEach(function(id){var el=document.getElementById(id);el.addEventListener('input',function(){if(myShown)renderMy()});el.addEventListener('change',function(){if(myShown)renderMy()});});
+  function syncMagiLabel(){var y=MY[val('m-yr')].magi;document.getElementById('m-inc-ko').textContent='수정 조정 총소득(MAGI, $) — '+y+'년 세금보고';document.getElementById('m-inc-en').textContent='Modified adjusted gross income (MAGI, $) — your '+y+' tax return';}
+  document.getElementById('m-yr').addEventListener('change',syncMagiLabel); syncMagiLabel();
+
   var _setLang=setLang;
-  setLang=function(l){_setLang(l);buildQuiz();if(quizShown)renderQuiz();renderCalc();};
+  setLang=function(l){_setLang(l);buildQuiz();if(quizShown)renderQuiz();renderCalc();if(myShown)renderMy();};
   document.getElementById('btn-ko').onclick=function(){setLang('ko')};
   document.getElementById('btn-en').onclick=function(){setLang('en')};
 

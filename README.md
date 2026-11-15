@@ -12,11 +12,12 @@ A free Korean/English guide that helps Korean-American seniors in Texas understa
 - Scam warning checklist and free official phone numbers (Medicare, Texas HICAP, Social Security, Senior Medicare Patrol)
 - Enrollment dates and how to enroll by phone
 - "Find my fit": an 8-question questionnaire and a 2027 yearly cost calculator comparing Plan G, Plan N, High-Deductible G and Advantage
+- "My own cost" (Step 3): personal monthly and yearly premiums for 2026 (official) or 2027 (projected), with income surcharge (IRMAA) by filing status, Part A premium by work quarters, Part A/B/D late penalties, MSP and Extra Help, and supplement premiums from your own quote or the state average (KFF analysis of NAIC data, 2025)
 
 AI letter translation and Q&A run only when the page is opened inside Claude; on GitHub Pages those sections show a notice instead.
 
 ## Sources
-Medicare.gov; CMS (CY2027 Rate Announcement, CY2027 MOOP standards, CY2026/2027 Medigap high-deductible notices); 2026 Medicare Trustees Report; Texas HHSC. Figures last checked October 11, 2026. 2027 Part A/B amounts are projections until CMS confirms them in November.
+Medicare.gov; CMS (CY2027 Rate Announcement, CY2027 MOOP standards, CY2026/2027 Medigap high-deductible notices); 2026 Medicare Trustees Report; Texas HHSC. Figures last checked November 15, 2026. 2027 Part A/B amounts are projections until CMS confirms them in November.
 
 ## Disclaimer
 Educational guide only. Not insurance sales, and not legal or financial advice. Not affiliated with any insurer.
