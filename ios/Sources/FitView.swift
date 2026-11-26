@@ -142,7 +142,14 @@ struct QuizView: View {
 
 struct CalculatorView: View {
     @EnvironmentObject var s: AppState
-    @State private var g = 180.0, n = 130.0, hd = 55.0, d = 40.0, m = 0.0, mc = 20.0, moop = 5900.0, v = 8.0
+    @State private var g = 180.0
+    @State private var n = 130.0
+    @State private var hd = 55.0
+    @State private var d = 40.0
+    @State private var m = 0.0
+    @State private var mc = 20.0
+    @State private var moop = 5900.0
+    @State private var v = 8.0
 
     var body: some View {
         let y = Figures.y2027
